@@ -14,6 +14,11 @@ requires = [
     'pyramid_debugtoolbar',
     'waitress',
     'ZODB3',
+    'plim',
+    'deform',
+    'pyramid_deform',
+    'pyramid_beaker',
+    'deform_bootstrap',
     ]
 
 setup(name='projeto',

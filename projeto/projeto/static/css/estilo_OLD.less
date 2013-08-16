@@ -1,0 +1,386 @@
+@font-face
+{
+  font-family: DejaVuSans;
+  src: url('/static/arte/DejaVuSans.ttf'),
+       url('/static/arte/DejaVuSans.eot'); /* IE9 */
+} 
+//@font-face
+//{
+//  font-family: DejaVuSansBold;
+//  src: url('/static/arte/DejaVuSans-Bold.ttf'),
+//       url('/static/arte/DejaVuSans-Bold.eot'); /* IE9 */
+//} 
+
+.centralizado {
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+body {
+  font-family: DejaVuSans;
+}
+
+.red {
+  font-style:normal;
+  color: red;
+}
+
+.centro {
+  position: relative;
+  .centralizado;
+  width: 800px;
+  //background-color: white;
+  //color: black;
+}
+
+.logo-inicial {
+  .centralizado;
+  width: 500px;
+  margin-top: 15px;
+}
+
+.img-inicial {
+  .centralizado;
+  width: 300px;
+}
+
+.quadrinho {
+  .centralizado;
+}
+.moldura {
+  position: relative;
+}
+.dialogo {
+  position: absolute;
+}
+
+.hr {
+  .centralizado;
+  width: 600px;
+  margin-bottom: 40px;
+  margin-top: 30px;
+}
+
+
+// B
+
+.justificado {
+  text-align: justify;
+}
+
+.fundo {
+  width: 800px;
+  height: 1200px;
+  position: relative;
+  //background-size: 800px 600px;
+  background-repeat: no-repeat;
+  //background-size: 800px 600px;
+}
+
+//.dialogo-telefone {
+//  display: block;
+//  position: absolute;
+//  width: 500px;
+//
+//  &.prim {
+//    left: 50px;
+//    top: 50px;
+//  }
+//  &.seg {
+//    left: 200px;
+//    top: 300px;
+//  }
+//}
+
+.icone-arquivo {
+  width: 20px;
+  height: 20px;
+  display: block;
+  float: left;
+}
+
+.email {
+	border: 2px solid;
+	border-color: #8D6825;
+}
+
+
+// NOVOS
+
+.lista-bots-tel {
+	display: block;
+	position: absolute;
+	left: 230px;
+	top: 265px;
+	padding: 0px;
+}
+
+.bot-tel {
+	display: block;
+	width: 175px;
+	height: 53px;
+}
+.conteudos {
+	line-height: 20px;
+	list-style: none;
+}
+
+.espaco-esquerdo {
+	padding: 20px;
+	width: 710px;
+}
+
+.botao {
+  height: 30px;
+  width: 30px;
+  position: absolute;
+  border-radius: 100px;
+  box-shadow: 2px 2px 1px #aaa;
+  z-index: 1;
+  &.deslogar {
+    top: 1px;
+    left: 770px;
+    background:url("/static/arte/bot_sa.png") no-repeat;
+  }
+  &.interogacao {
+    top: 1px;
+    left: 740px;
+    background:url("/static/arte/bot_ajuda.png") no-repeat;
+  }
+  &:hover {
+    background-color:orange;
+    box-shadow: 2px 2px 5px #000;
+  }
+}
+
+.menu-dir {
+  padding: 20px;
+  position: absolute;
+  left: 700px;
+  top: 0px;
+
+  a {
+    height: 60px;
+    width: 60px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    border-radius: 100px;
+    box-shadow: 2px 2px 1px #aaa;
+    &.si {
+      background:url("/static/arte/bot_si.png") no-repeat;
+    }
+    &.ds {
+      background:url("/static/arte/bot_ds.png") no-repeat;
+    }
+    &.da {
+      background:url("/static/arte/bot_da.png") no-repeat;
+    }
+    &.vi {
+      background:url("/static/arte/bot_vi.png") no-repeat;
+    }
+    &.at {
+      background:url("/static/arte/bot_at.png") no-repeat;
+    }
+    &.oc {
+      background:url("/static/arte/bot_oc.png") no-repeat;
+    }
+    &:hover {
+      background-color:orange;
+      box-shadow: 2px 2px 10px #000;
+    }
+    &.travado {
+      background-color:grey;
+      box-shadow: 0px 0px 0px #000;
+      &:hover {
+        background-color:grey;
+        box-shadow: 0px 0px 0px #000;
+      }
+    }
+  }
+}
+
+
+a.icone {
+  display: block;
+  position: absolute;
+  cursor: pointer;
+  height: 30px;
+  width: 30px;
+
+    background-size: 100% 100%;
+
+  &.menu-telefone {
+    height: 30px;
+    width: 175px;
+  }
+  &.telefone {
+    left: 590px; 
+    top: 385px;
+    width: 175px;
+    height: 80px;
+  }
+  &.oculos {
+    left: 360px; 
+    top: 360px;
+    width: 90px;
+    height: 40px;
+  }
+  &.computador {
+    left: 30px; 
+    top: 180px;
+    width: 140px;
+    height: 160px;
+  }
+  &.planejar {
+    left: 170px; 
+    top: 180px;
+    width: 100px;
+    height: 140px;
+  }
+  &.botfim {
+    left: 340px; 
+    top: 500px;
+    width: 100px;
+    height: 40px;
+  }
+
+  &.porque {
+    width: 152px;
+    height: 214px;
+    background-image:url("/static/arte/porque.png");
+  }
+  &.pipeline {
+    width: 129px;
+    height: 138px;
+    background-image:url("/static/arte/pipeline.png");
+  }
+  &.abc {
+    width: 170px;
+    height: 188px;
+    background-image:url("/static/arte/abc.png");
+  }
+  &.ciclo {
+    width: 132px;
+    height: 220px;
+    background-image:url("/static/arte/ciclo.png");
+  }
+  &.quantopedir {
+    width: 118px;
+    height: 230px;
+    background-image:url("/static/arte/quantopedir.png");
+  }
+  &.seguranca {
+    width: 250px;
+    height: 140px;
+    background-image:url("/static/arte/seguranca.png");
+  }
+}
+.porque {
+  left: 160px; 
+  top: 160px;
+}
+.pipeline {
+  left: 140px; 
+  top: 620px;
+}
+.abc {
+  left: 390px; 
+  top: 160px;
+}
+.ciclo {
+  left: 320px; 
+  top: 400px;
+}
+.quantopedir {
+  left: 500px; 
+  top: 700px;
+}
+.seguranca {
+  left: 460px; 
+  top: 420px;
+}
+
+.travado {
+  opacity: 0.4;
+  //pointer-events: none;
+  &:hover {
+    cursor: default;
+  }
+}
+
+.inicial {
+  margin-top: 30px;
+  margin-left: 300px;
+  width: 200px;
+}
+
+ul > li > a {
+  &.correta {
+    color: green;
+  }
+  &.errada {
+    color: red;
+  }
+}
+
+
+// BOOTSTRAP
+
+.form-actions {
+  //background-color: rgba(245, 245, 245,0.75);
+  margin-bottom: 30px;
+}
+span.req {
+  display: none;
+}
+.dropdown-menu > li > a {
+  padding-right: 50px;
+}
+.panel {
+  background-color: rgba(255, 255, 255, 0.75);
+}
+blockquote {
+  border-left: 0px solid rgb(255, 255, 255);
+  p {
+    font-size: 14px;
+  }
+}
+.progress {
+  width: 700px;
+  margin-top: 10px;
+}
+
+
+// BOOTSTRAP3 Gamb
+
+.panel-heading {
+  h3, h1 {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+}
+label {
+  font-family: sans-serif,Arial,"Helvetica Neue",Helvetica;
+}
+.form-control {
+  width: 300px;
+  display: inline;
+}
+.help-inline {
+  display: inline;
+}
+.panel-success .panel-heading{
+  color: rgb(70, 136, 71);
+  background-color: rgb(223, 240, 216);
+  border-color: rgb(214, 233, 198);
+}
+.btn-group.gamb0 {
+  position: static;
+}
+.btn-group.gamb1 {
+  top: -63px;
+  left: 80px;
+}

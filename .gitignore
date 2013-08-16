@@ -29,8 +29,10 @@ nosetests.xml
 # Translations
 *.mo
 
-.env
+env
 Data.fs*
+*.swp
+GIT
 
 # Mr Developer
 .mr.developer.cfg

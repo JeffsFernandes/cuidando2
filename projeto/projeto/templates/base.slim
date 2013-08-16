@@ -1,0 +1,31 @@
+doctype 5
+html
+  head
+    title
+      -block titulo
+        |Cuidando
+    meta charset="utf-8"
+    meta name="keywords" content="tranparencia"
+    meta name="author" content="GPopai"
+
+    link href="${request.static_url('projeto:static/arte/favicon.ico')}" rel="shortcut icon" 
+    /link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css" rel="stylesheet" type="text/css"
+    link href="${request.static_url('projeto:static/css/bootstrap.css')}" rel="stylesheet" type="text/css" 
+    /link href="${request.static_url('deform_bootstrap:static/deform_bootstrap.css')}" rel="stylesheet" type="text/css"
+    link href="${request.static_url('projeto:static/css/estilo.less')}" rel="stylesheet/less" type="text/css" 
+    script src="${request.static_url('projeto:static/js/less.js')}" type="text/javascript"
+    /script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js" type="text/javascript"
+    script src="${request.static_url('projeto:static/js/jquery-1.10.2.min.js')}" type="text/javascript"
+    /script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/js/bootstrap.min.js" type="text/javascript"
+    script src="${request.static_url('projeto:static/js/bootstrap.js')}" type="text/javascript"
+
+  body
+    .container
+      -block conteudo
+
+    -block final
+      script type="text/javascript"
+        $('input[type=text]').addClass('form-control');
+        $('input[type=password]').addClass('form-control');
+        $('.help-inline').addClass('help-block');
+        $('.error').addClass('has-error');
