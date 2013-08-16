@@ -12,8 +12,8 @@ requires = [
     'transaction',
     'pyramid_tm',
     'pyramid_debugtoolbar',
-    'ZODB',
     'waitress',
+    'ZODB3',
     ]
 
 setup(name='projeto',
