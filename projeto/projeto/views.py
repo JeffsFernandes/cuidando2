@@ -16,7 +16,7 @@ import deform
 import transaction
 
 
-@view_config(context=MyModel, renderer='templates/mytemplate.pt')
+@view_config(route_name='registro', renderer='templates/mytemplate.pt')
 def my_view(request):
     return {'project': 'projeto'}
 
