@@ -38,6 +38,7 @@ def main(global_config, **settings):
     config.add_static_view('deform_static', 'deform:static')
     config.add_static_view('deform_bootstrap', 'deform_bootstrap:static')
 
+    config.add_route('inicial', '/')
     config.add_route('registro', '/registrar')
     config.add_route('lista', '/listar')
 
