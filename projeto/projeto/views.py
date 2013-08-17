@@ -16,7 +16,7 @@ import deform
 import transaction
 
 
-@view_config(route_name='inicial', renderer='templates/mytemplate.pt')
+@view_config(route_name='inicial', renderer='inicial.slim')
 def my_view(request):
     return {'project': 'projeto'}
 
