@@ -11,6 +11,8 @@ from pyramid.httpexceptions import (
 from forms import (
     merge_session_with_post,
     FormRegistrar,
+    FormCadastrar,
+    FormConfigurar,
 )
 import deform
 import transaction
@@ -54,3 +56,57 @@ def lista(request):
     return {
         'cidadaos': cidadaos,
     }
+	
+@view_config(route_name='cadastro', renderer='cadastro.slim')
+def cadastro(request):
+    """Cadastro de usuário"""
+
+    esquema = FormCadastrar().bind(request=request)
+    esquema.title = "Cadastrar novo usuário"
+    form = deform.Form(esquema, buttons=('Cadastrar',))
+    if 'Cadastrar' in request.POST:
+        # Validação do formulário
+        try:
+            form.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+
+        # Criação e inserção
+        cidadao = Cidadao("","")
+        cidadao = merge_session_with_post(cidadao, request.POST.items())
+        request.db[cidadao.nome] = cidadao
+        #request.db.commit()
+        transaction.commit()
+        #request.session.flash(u"Usuário registrado com sucesso.")
+        #request.session.flash(u"Agora você já pode logar com ele.")
+        return HTTPFound(location=request.route_url('lista'))
+    else:
+        # Apresentação do formulário
+        return {'form': form.render()}
+
+@view_config(route_name='configuracao', renderer='configuracao.slim')
+def configuracao(request):
+    """Configuração de usuário"""
+
+    esquema = FormConfigurar().bind(request=request)
+    esquema.title = "Configurar"
+    form = deform.Form(esquema, buttons=('Salvar alterações',))
+    if 'Configurar' in request.POST:
+        # Validação do formulário
+        try:
+            form.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+
+        # Criação e inserção
+        cidadao = Cidadao("","")
+        cidadao = merge_session_with_post(cidadao, request.POST.items())
+        request.db[cidadao.nome] = cidadao
+        #request.db.commit()
+        transaction.commit()
+        #request.session.flash(u"Usuário registrado com sucesso.")
+        #request.session.flash(u"Agora você já pode logar com ele.")
+        return HTTPFound(location=request.route_url('lista'))
+    else:
+        # Apresentação do formulário
+        return {'form': form.render()}		
