@@ -1,0 +1,47 @@
+    nome = SchemaNode(
+        String(),
+        validator=All(
+            Length(max=32),
+            #Function(verif_nome_unico, u"Nome já cadastrado"),
+            Regex("^(\w)*$", "Usar apenas letras, números ou _"),
+        ),
+        description='Digite seu nome de usuário'
+    )
+    sobrenome = SchemaNode(
+        String(),
+        validator=All(
+            Length(max=32),
+            #Function(verif_nome_unico, u"Nome já cadastrado"),
+        ),
+        description='Digite seu sobrenome'
+    )	
+    genero = SchemaNode(
+        String())	
+    nascimento = SchemaNode(
+        String(),
+        description='Digite a data de nascimento'
+    )			
+    foto = SchemaNode(
+        String(),
+        description='Carregar foto')			
+    rua = SchemaNode(
+        String(),
+        description='Digite sua rua')
+    bairro = SchemaNode(
+        String(),
+        description='Digite seu bairro')
+    cidade = SchemaNode(
+        String(),
+        description='Digite sua cidade')
+    estado = SchemaNode(
+        String(),
+        description='Digite seu estado')		
+    informacoes = SchemaNode(
+        String(),
+        description='Digite informações sobre você')	
+    senha = SchemaNode(
+        String(),
+        validator=Length(min=5, max=32),
+        widget=widget.CheckedPasswordWidget(size=20),
+        description='Alterar sua senha (no mínimo 5 caracteres) e a confirme'
+    )	

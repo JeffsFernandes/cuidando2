@@ -71,12 +71,12 @@ def cadastro(request):
         except deform.ValidationFailure as e:
             return {'form': e.render()}
 
-        # Criação e inserção
-        cidadao = Cidadao("","")
-        cidadao = merge_session_with_post(cidadao, request.POST.items())
-        request.db[cidadao.nome] = cidadao
+        # Atualizar registro - usuário logado
+        #cidadao = Cidadao("","")
+        #cidadao = merge_session_with_post(cidadao, request.POST.items())
+        #request.db[cidadao.nome] = cidadao
         #request.db.commit()
-        transaction.commit()
+        #transaction.commit()
         #request.session.flash(u"Usuário registrado com sucesso.")
         #request.session.flash(u"Agora você já pode logar com ele.")
         return HTTPFound(location=request.route_url('lista'))
@@ -89,8 +89,8 @@ def configuracao(request):
     """Configuração de usuário"""
 
     esquema = FormConfigurar().bind(request=request)
-    esquema.title = "Configurar"
-    form = deform.Form(esquema, buttons=('Salvar alterações',))
+    esquema.title = "Configuração de usuário"
+    form = deform.Form(esquema, buttons=('Salvar',))
     if 'Configurar' in request.POST:
         # Validação do formulário
         try:

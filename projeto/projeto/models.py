@@ -119,7 +119,7 @@ class Midia(Persistent):
         self.data = data
         self.cidadao = cidadao    
 
-class Midia_foto(Persistent):
+class Midia_foto(Midia):
 
     def __init__(
         self,
@@ -131,7 +131,7 @@ class Midia_foto(Persistent):
         self.imagem = imagem
         self.data = data        
 
-class Midia_video(Persistent):
+class Midia_video(Midia):
 
     def __init__(
         self,
@@ -143,7 +143,7 @@ class Midia_video(Persistent):
         self.imagem = imagem
         self.data = data            
 
-class Midia_comentario(Persistent):
+class Midia_comentario(Midia):
 
     def __init__(
         self,

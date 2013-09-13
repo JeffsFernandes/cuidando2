@@ -65,7 +65,7 @@ class FormCadastrar(CSRFSchema):
         validator=Length(min=5, max=32),
         widget=widget.CheckedPasswordWidget(size=20),
         description='Digite sua senha (no mínimo 5 caracteres) e a confirme')
-
+		
 class FormConfigurar(CSRFSchema):
     nome = SchemaNode(
         String(),
@@ -76,41 +76,14 @@ class FormConfigurar(CSRFSchema):
         ),
         description='Digite seu nome de usuário'
     )
-    sobrenome = SchemaNode(
+    email = SchemaNode(
         String(),
-        validator=All(
-            Length(max=32),
-            #Function(verif_nome_unico, u"Nome já cadastrado"),
-        ),
-        description='Digite seu sobrenome'
-    )	
-    genero = SchemaNode(
-        String())	
-    nascimento = SchemaNode(
-        String(),
-        description='Digite a data de nascimento'
-    )			
-    foto = SchemaNode(
-        String(),
-        description='Carregar foto')			
-    rua = SchemaNode(
-        String(),
-        description='Digite sua rua')
-    bairro = SchemaNode(
-        String(),
-        description='Digite seu bairro')
-    cidade = SchemaNode(
-        String(),
-        description='Digite sua cidade')
-    estado = SchemaNode(
-        String(),
-        description='Digite seu estado')		
-    informacoes = SchemaNode(
-        String(),
-        description='Digite informações sobre você')	
+		validator=Email('Email inválido'),
+        description='Digite seu e-mail'
+	)	
     senha = SchemaNode(
         String(),
         validator=Length(min=5, max=32),
         widget=widget.CheckedPasswordWidget(size=20),
-        description='Alterar sua senha (no mínimo 5 caracteres) e a confirme'
-    )		
+        description='Digite sua senha (no mínimo 5 caracteres) e a confirme')	
+	
