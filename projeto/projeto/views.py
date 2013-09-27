@@ -10,14 +10,12 @@ from pyramid.httpexceptions import (
 )
 from forms import (
     merge_session_with_post,
-    FormRegistrar,
     FormCadastrar,
     FormConfigurar,
     FormContato,	
 )
 import deform
 import transaction
-
 
 @view_config(route_name='inicial', renderer='inicial.slim')
 def my_view(request):

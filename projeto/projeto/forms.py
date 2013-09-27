@@ -73,22 +73,8 @@ notificacoes = (
 tipoNot = (
     ('ponto', 'Atualizações de pontos próximos ao endereço cadastrado'),
     ('evento', 'Eventos próximos ao endereço cadastrado'))
-		
-class FormRegistrar(CSRFSchema):
-    nome = SchemaNode(
-        String(),
-        validator=All(
-            Length(max=32),
-            #Function(verif_nome_unico, u"Nome já cadastrado"),
-            Regex("^(\w)*$", "Usar apenas letras, números ou _"),
-        ),
-        description='Digite seu nome de usuário'
-    )	
-    senha = SchemaNode(
-        String(),
-        validator=Length(min=5, max=32),
-        widget=widget.CheckedPasswordWidget(size=20),
-        description='Digite sua senha (no mínimo 5 caracteres) e a confirme')	
+booleano = (('sim', 'Aceitar termos e condições'))
+	
 	
 class FormCadastrar(CSRFSchema):
     nome = SchemaNode(
@@ -117,11 +103,10 @@ class FormCadastrar(CSRFSchema):
     )
     
     confirmar = SchemaNode(
-        Boolean(),
+        String(),
         description='Confirmar',		
-        widget=widget.CheckboxWidget(),
-        label='Aceitar termos e condições',
-		title='Check que naõ funfa...'
+        widget=widget.CheckboxChoiceWidget(values=booleano),
+		title='Confirmar'
     )			
 
 class FormConfigurar(CSRFSchema):
@@ -211,8 +196,6 @@ class FormConfigurar(CSRFSchema):
         widget=widget.CheckboxChoiceWidget(values=tipoNot),	
         title='Tipos de notificações')	
 	
-
-
 class FormContato(CSRFSchema):
     nome = SchemaNode(
         String(),
