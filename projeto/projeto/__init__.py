@@ -39,10 +39,10 @@ def main(global_config, **settings):
     config.add_static_view('deform_bootstrap', 'deform_bootstrap:static')
 
     config.add_route('inicial', '/')
-    config.add_route('registro', '/registrar')
     config.add_route('lista', '/listar')
     config.add_route('cadastro', '/cadastrar')
     config.add_route('configuracao', '/configurar')
-	
+    config.add_route('contato', '/contato')
+
     config.scan()
     return config.make_wsgi_app()
