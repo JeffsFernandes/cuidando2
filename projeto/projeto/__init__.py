@@ -43,6 +43,11 @@ def main(global_config, **settings):
     config.add_route('cadastro', '/cadastrar')
     config.add_route('configuracao', '/configurar')
     config.add_route('contato', '/contato')
-
+    config.add_route('login', '/login')
+    config.add_route('sobre', '/sobre')
+    config.add_route('usuario', '/usuario')
+    config.add_route('mapa', '/mapa')
+    config.add_route('orcamento', '/orcamento')	
+	
     config.scan()
     return config.make_wsgi_app()

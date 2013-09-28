@@ -12,7 +12,12 @@ from forms import (
     merge_session_with_post,
     FormCadastrar,
     FormConfigurar,
-    FormContato,	
+    FormContato,
+    FormSobre,
+    FormUsuario,
+    FormLogin,	
+    FormMapa,
+    FormOrcamento,	
 )
 import deform
 import transaction
@@ -102,3 +107,85 @@ def contato(request):
         # Apresentação do formulário
         return {'form': form.render()}
 
+@view_config(route_name='login', renderer='login.slim')
+def login(request):
+
+    esquema = FormLogin().bind(request=request)
+    esquema.title = "Login"
+    form = deform.Form(esquema, buttons=('Enviar',))
+    if 'Contato' in request.POST:
+
+        try:
+            form.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+
+        return HTTPFound(location=request.route_url('lista'))
+    else:
+        return {'form': form.render()}
+    
+@view_config(route_name='usuario', renderer='usuario.slim')
+def usuario(request):
+
+    esquema = FormUsuario().bind(request=request)
+    esquema.title = "Página do usuário"
+    form = deform.Form(esquema)
+    if 'Usuario' in request.POST:
+
+        try:
+            form.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+
+        return HTTPFound(location=request.route_url('lista'))
+    else:
+        return {'form': form.render()}
+
+@view_config(route_name='sobre', renderer='sobre.slim')
+def sobre(request):
+
+    esquema = FormSobre().bind(request=request)
+    esquema.title = "Sobre o Cuidando"
+    form = deform.Form(esquema)
+    if 'Sobre' in request.POST:
+
+        try:
+            form.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+
+        return HTTPFound(location=request.route_url('lista'))
+    else:
+        return {'form': form.render()}
+
+@view_config(route_name='mapa', renderer='mapa.slim')
+def mapa(request):
+
+    esquema = FormContato().bind(request=request)
+    esquema.title = "Mapa de orçamentos"
+    form = deform.Form(esquema, buttons=('Inserir ponto',))
+    if 'Mapa' in request.POST:
+        try:
+            form.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+
+        return HTTPFound(location=request.route_url('lista'))
+    else:
+        return {'form': form.render()} 		
+
+@view_config(route_name='orcamento', renderer='orcamento.slim')
+def orcamento(request):
+
+    esquema = FormOrcamento().bind(request=request)
+    esquema.title = "Detalhes do orçamento"
+    form = deform.Form(esquema, buttons=('Enviar',))
+    if 'Orcamento' in request.POST:
+        try:
+            form.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+
+        return HTTPFound(location=request.route_url('lista'))
+    else:
+        return {'form': form.render()}
