@@ -223,39 +223,7 @@ class FormContato(CSRFSchema):
         title='Mensagem',
         validator=Length(max=100),
         widget=widget.TextAreaWidget(rows=10, cols=60)
-    )				
-	
-class FormContato(CSRFSchema):
-    nome = SchemaNode(
-        String(),
-        validator=All(
-            Length(max=32),
-            #Function(verif_nome_unico, u"Nome já cadastrado"),
-            Regex("^(\w)*$", "Usar apenas letras, números ou _"),
-        ),
-        description='Digite seu nome de usuário'
-    )
-    assunto = SchemaNode(
-        String(),
-        validator=All(
-            Length(max=32),
-            #Function(verif_nome_unico, u"Nome já cadastrado"),
-            Regex("^(\w)*$", "Usar apenas letras, números ou _"),
-        )
-    )	
-    email = SchemaNode(
-        String(),
-		validator=Email('E-mail inválido'),
-        description='Digite seu e-mail'
-	)	
-    mensagem = SchemaNode(
-        String(),
-        missing=unicode(''),		
-        description='Digite sua mensagem',
-        title='Mensagem',
-        validator=Length(max=100),
-        widget=widget.TextAreaWidget(rows=10, cols=60)
-    )				
+    )						
 
 class FormSobre(CSRFSchema):
     mensagem = SchemaNode(
@@ -288,21 +256,23 @@ class FormMapa(CSRFSchema):
     )
 
 class FormOrcamento(CSRFSchema):
-    mensagem = SchemaNode(
+    comentario = SchemaNode(
         String(),
         missing=unicode(''),		
-        description='Digite sua mensagem',
-        title='Mensagem',
+        description='Comente sobre o orçamento',
+        title='Comentário',
         validator=Length(max=100),
         widget=widget.TextAreaWidget(rows=10, cols=60)
     )	
 	
 class FormLogin(CSRFSchema):
-    mensagem = SchemaNode(
+    email = SchemaNode(
         String(),
-        missing=unicode(''),		
-        description='Digite sua mensagem',
-        title='Mensagem',
-        validator=Length(max=100),
-        widget=widget.TextAreaWidget(rows=10, cols=60)
-    )		
+		validator=Email('E-mail inválido'),
+        description='Digite seu e-mail'
+	)	
+    senha = SchemaNode(
+        String(),
+        validator=Length(min=5, max=32),
+        description='Digite sua senha'
+    )

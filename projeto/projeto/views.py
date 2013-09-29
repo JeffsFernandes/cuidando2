@@ -112,8 +112,8 @@ def login(request):
 
     esquema = FormLogin().bind(request=request)
     esquema.title = "Login"
-    form = deform.Form(esquema, buttons=('Enviar',))
-    if 'Contato' in request.POST:
+    form = deform.Form(esquema, buttons=('Entrar', 'Esqueci a senha'))
+    if 'Login' in request.POST:
 
         try:
             form.validate(request.POST.items())
@@ -161,7 +161,7 @@ def sobre(request):
 @view_config(route_name='mapa', renderer='mapa.slim')
 def mapa(request):
 
-    esquema = FormContato().bind(request=request)
+    esquema = FormMapa().bind(request=request)
     esquema.title = "Mapa de orçamentos"
     form = deform.Form(esquema, buttons=('Inserir ponto',))
     if 'Mapa' in request.POST:
