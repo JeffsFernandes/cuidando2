@@ -17,6 +17,7 @@ from forms import (
     FormUsuario,
     FormLogin,	
     FormMapa,
+    FormInserirP,
     FormOrcamento,	
 )
 import deform
@@ -46,13 +47,13 @@ def cadastro(request):
             form.validate(request.POST.items())
         except deform.ValidationFailure as e:
             return {'form': e.render()}
-
-        # Atualizar registro - usuário logado
-        #cidadao = Cidadao("","")
-        #cidadao = merge_session_with_post(cidadao, request.POST.items())
-        #request.db[cidadao.nome] = cidadao
+			
+		# Criação e inserção	
+        cidadao = Cidadao("","")
+        cidadao = merge_session_with_post(cidadao, request.POST.items())
+        request.db[cidadao.nome] = cidadao
         #request.db.commit()
-        #transaction.commit()
+        transaction.commit()
         #request.session.flash(u"Usuário registrado com sucesso.")
         #request.session.flash(u"Agora você já pode logar com ele.")
         return HTTPFound(location=request.route_url('lista'))
@@ -74,13 +75,13 @@ def configuracao(request):
             form.validate(request.POST.items())
         except deform.ValidationFailure as e:
             return {'form': e.render()}
-
-        # Criação e inserção
-        cidadao = Cidadao("","")
-        cidadao = merge_session_with_post(cidadao, request.POST.items())
-        request.db[cidadao.nome] = cidadao
+        
+        # Atualizar registro - usuário logado  ??		
+        #cidadao = Cidadao("","")
+        #cidadao = merge_session_with_post(cidadao, request.POST.items())
+        #request.db[cidadao.nome] = cidadao
         #request.db.commit()
-        transaction.commit()
+        #transaction.commit()
         #request.session.flash(u"Usuário registrado com sucesso.")
         #request.session.flash(u"Agora você já pode logar com ele.")
         return HTTPFound(location=request.route_url('lista'))
@@ -181,6 +182,22 @@ def orcamento(request):
     esquema.title = "Detalhes do orçamento"
     form = deform.Form(esquema, buttons=('Enviar',))
     if 'Orcamento' in request.POST:
+        try:
+            form.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+
+        return HTTPFound(location=request.route_url('lista'))
+    else:
+        return {'form': form.render()}
+	
+@view_config(route_name='inserir_ponto', renderer='inserir_ponto.slim')
+def inserir_ponto(request):
+
+    esquema = FormInserirP().bind(request=request)
+    esquema.title = "Inserir ponto no mapa"
+    form = deform.Form(esquema, buttons=('Inserir', 'Cancelar'))
+    if 'inserir_ponto' in request.POST:
         try:
             form.validate(request.POST.items())
         except deform.ValidationFailure as e:

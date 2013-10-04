@@ -276,3 +276,20 @@ class FormLogin(CSRFSchema):
         validator=Length(min=5, max=32),
         description='Digite sua senha'
     )
+
+class FormInserirP(CSRFSchema):
+    titulo = SchemaNode(
+        String(),
+        validator=All(
+            Length(max=32),
+            Regex("^(\w)*$", "Usar apenas letras, números ou _"),
+        ),
+        description='Nome do local')
+    comentario = SchemaNode(
+        String(),
+        missing=unicode(''),		
+        description='Comente sobre o orçamento',
+        title='Comentário',
+        validator=Length(max=100),
+        widget=widget.TextAreaWidget(rows=10, cols=60)
+    )		
