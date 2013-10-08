@@ -5,6 +5,7 @@ from pkg_resources import resource_filename
 from pyramid.i18n import get_localizer
 from pyramid.threadlocal import get_current_request
 from .models import appmaker
+from pyramid_beaker import session_factory_from_settings
 
 
 def root_factory(request):
@@ -17,13 +18,21 @@ def root_factory(request):
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
-    config = Configurator(root_factory=root_factory, settings=settings)
-    
+    #ja esta no dev.ini
+    #config.include('pyramid_beaker')
+    session_factory = session_factory_from_settings(settings)  
+
+    config = Configurator(
+        root_factory=root_factory,
+        settings=settings,
+        session_factory=session_factory)
+	
     config.add_translation_dirs(
         'colander:locale',
         'deform:locale',
     )
-
+    #config.set_session_factory(session_factory)
+	
     def translator(term):
         return get_localizer(get_current_request()).translate(term)
     deform_dir = resource_filename('deform', 'templates/')
@@ -49,6 +58,8 @@ def main(global_config, **settings):
     config.add_route('mapa', '/mapa')
     config.add_route('orcamento', '/orcamento')	
     config.add_route('inserir_ponto', '/inserir_ponto')	
+    config.add_route('privacidade', '/privacidade')	
+    config.add_route('termos', '/termos')	
 	
     config.scan()
     return config.make_wsgi_app()

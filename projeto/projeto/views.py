@@ -3,6 +3,8 @@
 
 from pyramid.view import view_config
 from .models import Cidadao, MyModel
+from beaker.middleware import SessionMiddleware
+
 from pyramid.httpexceptions import (
     HTTPFound,
     HTTPNotFound,
@@ -23,8 +25,24 @@ from forms import (
 import deform
 import transaction
 
+def simple_app(environ, start_response):
+    # Get the session object from the environ
+    session = environ['beaker.session']
+
+    # Check to see if a value is in the session
+    user = 'logged_in' in session
+
+    # Set some other session variable
+    session['user_id'] = 10
+
+    start_response('200 OK', [('Content-type', 'text/plain')])
+    return ['User is logged in: %s' % user]
+
 @view_config(route_name='inicial', renderer='inicial.slim')
 def my_view(request):
+    session = request.session
+    session['name'] = 'Teste1' 
+    session.save()
     return {'project': 'projeto'}
 
 @view_config(route_name='lista', renderer='lista.slim')
@@ -115,9 +133,11 @@ def login(request):
     esquema.title = "Login"
     form = deform.Form(esquema, buttons=('Entrar', 'Esqueci a senha'))
     if 'Login' in request.POST:
-
         try:
             form.validate(request.POST.items())
+			#request.session[request.POST.items()]
+            #login = request.POST.get('login')
+            #password = request.POST.get('password')			
         except deform.ValidationFailure as e:
             return {'form': e.render()}
 
@@ -198,6 +218,38 @@ def inserir_ponto(request):
     esquema.title = "Inserir ponto no mapa"
     form = deform.Form(esquema, buttons=('Inserir', 'Cancelar'))
     if 'inserir_ponto' in request.POST:
+        try:
+            form.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+
+        return HTTPFound(location=request.route_url('lista'))
+    else:
+        return {'form': form.render()}
+
+@view_config(route_name='privacidade', renderer='privacidade.slim')
+def privacidade(request):
+
+    esquema = FormInserirP().bind(request=request)
+    esquema.title = "Inserir ponto no mapa"
+    form = deform.Form(esquema)
+    if 'privacidade' in request.POST:
+        try:
+            form.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+
+        return HTTPFound(location=request.route_url('lista'))
+    else:
+        return {'form': form.render()}
+		
+@view_config(route_name='termos', renderer='termos.slim')		
+def termos(request):
+
+    esquema = FormInserirP().bind(request=request)
+    esquema.title = "Inserir ponto no mapa"
+    form = deform.Form(esquema)
+    if 'privacidade' in request.POST:
         try:
             form.validate(request.POST.items())
         except deform.ValidationFailure as e:

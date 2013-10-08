@@ -30,7 +30,7 @@ def merge_session_with_post(session, post):
     for key, value in post:
         setattr(session, key, value)
     return session
-
+	
 generos = (
     ('', '-Selecionar-'),
     ('fem', 'Feminino'),
