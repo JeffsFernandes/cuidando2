@@ -33,14 +33,27 @@ html
             li
               a href="${request.route_url('lista')}" Listar
             li
-              a href="${request.route_url('cadastro')}" Cadastrar			  
+              a href="${request.route_url('mapa')}" Mapa
             li
-              a href="${request.route_url('configuracao')}" Configurar			
+              a href="${request.route_url('inserir_ponto')}" Inserir ponto					  
             li
-              a href="${request.route_url('contato')}" Contato					  
-    .container
+              a href="${request.route_url('orcamento')}" Orçamento	
+            li
+              a href="${request.route_url('login')}" Login		
+            li
+              a href="${request.route_url('cadastro')}" Cadastrar				  
+            li
+              a href="${request.route_url('usuario')}" Usuário		
+            li
+              a href="${request.route_url('configuracao')}" Configurar			  
+            li
+              a href="${request.route_url('sobre')}" Sobre				  
+            li
+              a href="${request.route_url('contato')}" Contato					   
+	.container
+	  h1 Cuidando do meu bairro
+      h2 São Paulo   
       -block conteudo
-
     -block final
       script type="text/javascript"
         $('input[type=text]').addClass('form-control');

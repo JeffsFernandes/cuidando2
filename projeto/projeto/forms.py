@@ -26,12 +26,11 @@ def record_to_appstruct(self):
     return dict([(k, self.__dict__[k]) for k in sorted(self.__dict__)
                  if '_sa_' != k[:4]])
 
-
 def merge_session_with_post(session, post):
     for key, value in post:
         setattr(session, key, value)
     return session
-
+	
 generos = (
     ('', '-Selecionar-'),
     ('fem', 'Feminino'),
@@ -73,9 +72,7 @@ notificacoes = (
 tipoNot = (
     ('ponto', 'Atualizações de pontos próximos ao endereço cadastrado'),
     ('evento', 'Eventos próximos ao endereço cadastrado'))
-booleano = (('sim', 'Aceitar termos e condições'))
-	
-	
+			
 class FormCadastrar(CSRFSchema):
     nome = SchemaNode(
         String(),
@@ -103,10 +100,10 @@ class FormCadastrar(CSRFSchema):
     )
     
     confirmar = SchemaNode(
-        String(),
-        description='Confirmar',		
-        widget=widget.CheckboxChoiceWidget(values=booleano),
-		title='Confirmar'
+        Boolean(),	
+        label='Aceitar termos e condições',
+		title='Confirmar',
+        widget=widget.CheckboxWidget(),
     )			
 
 class FormConfigurar(CSRFSchema):
@@ -217,12 +214,18 @@ class FormContato(CSRFSchema):
     email = SchemaNode(
         String(),
 		validator=Email('E-mail inválido'),
-        description='Digite seu e-mail',
-        widget=widget.CheckedInputWidget(
-            subject='Email',
-            confirm_subject='Confirmar e-mail',
-            size=40)
+        description='Digite seu e-mail'
 	)	
+    mensagem = SchemaNode(
+        String(),
+        missing=unicode(''),		
+        description='Digite sua mensagem',
+        title='Mensagem',
+        validator=Length(max=100),
+        widget=widget.TextAreaWidget(rows=10, cols=60)
+    )						
+
+class FormSobre(CSRFSchema):
     mensagem = SchemaNode(
         String(),
         missing=unicode(''),		
@@ -232,3 +235,61 @@ class FormContato(CSRFSchema):
         widget=widget.TextAreaWidget(rows=10, cols=60)
     )				
 	
+class FormUsuario(CSRFSchema):
+    mensagem = SchemaNode(
+        String(),
+        missing=unicode(''),		
+        description='Digite sua mensagem',
+        title='Mensagem',
+        validator=Length(max=100),
+        widget=widget.TextAreaWidget(rows=10, cols=60)
+    )
+
+class FormMapa(CSRFSchema):
+    mensagem = SchemaNode(
+        String(),
+        missing=unicode(''),		
+        description='Digite sua mensagem',
+        title='Mensagem',
+        validator=Length(max=100),
+        widget=widget.TextAreaWidget(rows=10, cols=60)
+    )
+
+class FormOrcamento(CSRFSchema):
+    comentario = SchemaNode(
+        String(),
+        missing=unicode(''),		
+        description='Comente sobre o orçamento',
+        title='Comentário',
+        validator=Length(max=100),
+        widget=widget.TextAreaWidget(rows=10, cols=60)
+    )	
+	
+class FormLogin(CSRFSchema):
+    email = SchemaNode(
+        String(),
+		validator=Email('E-mail inválido'),
+        description='Digite seu e-mail'
+	)	
+    senha = SchemaNode(
+        String(),
+        validator=Length(min=5, max=32),
+        description='Digite sua senha'
+    )
+
+class FormInserirP(CSRFSchema):
+    titulo = SchemaNode(
+        String(),
+        validator=All(
+            Length(max=32),
+            Regex("^(\w)*$", "Usar apenas letras, números ou _"),
+        ),
+        description='Nome do local')
+    comentario = SchemaNode(
+        String(),
+        missing=unicode(''),		
+        description='Comente sobre o orçamento',
+        title='Comentário',
+        validator=Length(max=100),
+        widget=widget.TextAreaWidget(rows=10, cols=60)
+    )		
