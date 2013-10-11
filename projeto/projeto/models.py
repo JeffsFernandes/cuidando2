@@ -10,7 +10,7 @@ class MyModel(PersistentMapping):
     __parent__ = __name__ = None
 
 
-class Cidadao(Persistent):
+class Cidadao(PersistentMapping):
 
     def __init__(
         self,
@@ -209,9 +209,14 @@ class Denuncia(Persistent):
 		
 def appmaker(zodb_root):
     alterado = False
+    print("APPPPPPPPPPPP")
     if not 'cidadaos' in zodb_root:
-        zodb_root['cidadaos'] = {}
+        print("VAZIO!!!!")
+        zodb_root['cidadaos'] = PersistentMapping()
         alterado = True
+    print(len(zodb_root))
+    print(zodb_root.keys())
+    print(zodb_root['cidadaos'].keys())
 
     if alterado:
         transaction.commit()
