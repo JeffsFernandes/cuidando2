@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" /><![endif]-->
+	<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+
+	<link rel="stylesheet" href="MarkerCluster.css" />
+	<link rel="stylesheet" href="MarkerCluster.Default.css" />
+	<script src="leaflet.markercluster-src.js"></script>
+	<script src="saida.js"></script>
+</head>
+
+<body>
+	<div id="map" style="height: 800px;"></div>
+	<h1>Mapa</h1>
+	<script>
+
+		var map = L.map('map').setView([-23,-46], 10);
+
+		L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
+		}).addTo(map);
+
+
+		L.marker([-23,-46]).addTo(map)
+			.bindPopup("<b>Hello world!</b><br />I am a popup.");
+
+	//	L.polygon([
+	//		[51.509, -0.08],
+	//		[51.503, -0.06],
+	//		[51.51, -0.047]
+	//	]).addTo(map).bindPopup("I am a polygon.");
+
+
+	//	var popup = L.popup();
+
+	//	function onMapClick(e) {
+	//		popup
+	//			.setLatLng(e.latlng)
+	//			.setContent("You clicked the map at " + e.latlng.toString())
+	//			.openOn(map);
+	//	}
+
+	//	map.on('click', onMapClick);
+
+	</script>
+	<script type="text/javascript">
+
+		var markers = L.markerClusterGroup();
+		
+		for (var i = 0; i < addressPoints.length; i++) {
+			var a = addressPoints[i];
+			var title = a[2];
+			var marker = L.marker(new L.LatLng(a[0], a[1]), { title: title });
+			marker.bindPopup(title);
+			markers.addLayer(marker);
+		}
+
+		map.addLayer(markers);
+
+	</script>
+</body>
+</html>
