@@ -4,6 +4,27 @@
 from persistent.mapping import PersistentMapping
 from persistent import Persistent
 import transaction
+from pyramid.security import (
+    Allow,
+    Everyone,
+    ALL_PERMISSIONS,
+    )
+from pyramid_zodbconn import get_connection
+
+
+class RootFactory(object):
+    __acl__ = [
+        (Allow, 'g:admin', ALL_PERMISSIONS),
+        (Allow, 'g:cidadao', 'basica'),
+        (Allow, Everyone, 'comum'),
+    ]
+
+    def __init__(self, request):
+        conn = get_connection(request)
+        request.db = conn.root()
+        appmaker(conn.root())
+        #return None
+        #return conn.root()
 
 
 class MyModel(PersistentMapping):
@@ -209,14 +230,9 @@ class Denuncia(Persistent):
 		
 def appmaker(zodb_root):
     alterado = False
-    print("APPPPPPPPPPPP")
     if not 'cidadaos' in zodb_root:
-        print("VAZIO!!!!")
         zodb_root['cidadaos'] = PersistentMapping()
         alterado = True
-    print(len(zodb_root))
-    print(zodb_root.keys())
-    print(zodb_root['cidadaos'].keys())
 
     if alterado:
         transaction.commit()

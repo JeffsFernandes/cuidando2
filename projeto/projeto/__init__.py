@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from pyramid.config import Configurator
-from pyramid_zodbconn import get_connection
 import deform
 from pkg_resources import resource_filename
 from pyramid.i18n import get_localizer
 from pyramid.threadlocal import get_current_request
-from .models import appmaker
+from .models import RootFactory
 from pyramid_beaker import session_factory_from_settings
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -15,24 +14,18 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from security import groupfinder
 
 
-def root_factory(request):
-    conn = get_connection(request)
-    request.db = conn.root()
-    appmaker(conn.root())
-    return conn.root()
-
-
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
     #ja esta no dev.ini
     #config.include('pyramid_beaker')
-    session_factory = session_factory_from_settings(settings)  
+    #session_factory = session_factory_from_settings(settings)  
 
     config = Configurator(
-        root_factory=root_factory,
+        root_factory=RootFactory,
         settings=settings,
-        session_factory=session_factory)
+        #session_factory=session_factory,
+    )
 
     authn_policy = AuthTktAuthenticationPolicy(
         secret='2398ry289$#T$#Tnykki4jh3t4t34239ryh9',
@@ -70,6 +63,7 @@ def main(global_config, **settings):
     config.add_route('configuracao', '/configurar')
     config.add_route('contato', '/contato')
     config.add_route('login', '/login')
+    config.add_route('logout', '/logout')
     config.add_route('sobre', '/sobre')
     config.add_route('usuario', '/usuario')
     config.add_route('mapa', '/mapa')

@@ -10,6 +10,11 @@ from pyramid.httpexceptions import (
     HTTPNotFound,
     #HTTPForbidden,
 )
+from pyramid.security import (
+    remember,
+    forget,
+    authenticated_userid,
+)
 from forms import (
     merge_session_with_post,
     FormCadastrar,
@@ -45,7 +50,11 @@ def my_view(request):
     session.save()
     return {'project': 'projeto'}
 
-@view_config(route_name='lista', renderer='lista.slim')
+@view_config(
+    route_name='lista',
+    renderer='lista.slim',
+    permission='comum'
+)
 def lista(request):
     cidadaos = request.db['cidadaos'].values()
     return {
@@ -69,7 +78,7 @@ def cadastro(request):
 		# Criação e inserção	
         cidadao = Cidadao("","")
         cidadao = merge_session_with_post(cidadao, request.POST.items())
-        request.db['cidadaos'][cidadao.nome] = cidadao
+        request.db['cidadaos'][cidadao.email] = cidadao
         #request.db.commit()
         transaction.commit()
         request.session.flash(u"Usuário registrado com sucesso.")
@@ -79,7 +88,11 @@ def cadastro(request):
         # Apresentação do formulário
         return {'form': form.render()}
 
-@view_config(route_name='configuracao', renderer='configuracao.slim')
+@view_config(
+    route_name='configuracao',
+    renderer='configuracao.slim',
+    permission='basica'
+)
 def configuracao(request):
     """Configuração de usuário"""
 
@@ -126,13 +139,23 @@ def contato(request):
         # Apresentação do formulário
         return {'form': form.render()}
 
+@view_config(route_name='logout', permission='basica')
+def logout(request):
+    """Página para logout"""
+    headers = forget(request)
+    request.session.flash(u"Você foi deslogado.")
+    #request.session.pop_flash()
+    return HTTPFound(location=request.route_url('inicial'), headers=headers)
+
+
 @view_config(route_name='login', renderer='login.slim')
 def login(request):
 
     esquema = FormLogin().bind(request=request)
     esquema.title = "Login"
     form = deform.Form(esquema, buttons=('Entrar', 'Esqueci a senha'))
-    if 'Login' in request.POST:
+    print(request.POST)
+    if 'Entrar' in request.POST:
         try:
             form.validate(request.POST.items())
 			#request.session[request.POST.items()]
@@ -141,7 +164,12 @@ def login(request):
         except deform.ValidationFailure as e:
             return {'form': e.render()}
 
-        return HTTPFound(location=request.route_url('lista'))
+        email = request.POST.get("email")
+        headers = remember(request, email)
+        print("LOGADO!!!!!!!!!!!!!!", email)
+
+        next = request.route_url('lista')
+        return HTTPFound(location=next, headers=headers)
     else:
         return {'form': form.render()}
     

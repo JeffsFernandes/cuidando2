@@ -50,6 +50,9 @@ html
               a href="${request.route_url('sobre')}" Sobre				  
             li
               a href="${request.route_url('contato')}" Contato					   
+            -if hasattr(request, 'cidadao')
+              li
+                a href="${request.route_url('logout')}" Sair					   
 	.container
 	  h1 Cuidando do meu bairro
       h2 São Paulo   

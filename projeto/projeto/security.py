@@ -7,7 +7,7 @@ def groupfinder(identificador, request):
 
     cid = request.db['cidadaos'].get(identificador)
     request.cidadao = cid
-    if cid:
+    if cid is not None:
         grupos.append('g:cidadao')
 
     return grupos
