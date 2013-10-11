@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from pyramid.config import Configurator
 from pyramid_zodbconn import get_connection
 import deform
@@ -6,6 +9,10 @@ from pyramid.i18n import get_localizer
 from pyramid.threadlocal import get_current_request
 from .models import appmaker
 from pyramid_beaker import session_factory_from_settings
+from pyramid.authentication import AuthTktAuthenticationPolicy
+from pyramid.authorization import ACLAuthorizationPolicy
+
+from security import groupfinder
 
 
 def root_factory(request):
@@ -26,13 +33,24 @@ def main(global_config, **settings):
         root_factory=root_factory,
         settings=settings,
         session_factory=session_factory)
+
+    authn_policy = AuthTktAuthenticationPolicy(
+        secret='@#F#4f3g8fg734ffuh3498y83h34f3nwdp[]]290&',
+        callback=groupfinder,
+        include_ip=True,
+        hashalg='sha512',
+        timeout=21600,
+    )
+    authz_policy = ACLAuthorizationPolicy()
+    config.set_authentication_policy(authn_policy)
+    config.set_authorization_policy(authz_policy)
+
 	
     config.add_translation_dirs(
         'colander:locale',
         'deform:locale',
     )
     #config.set_session_factory(session_factory)
-	
     def translator(term):
         return get_localizer(get_current_request()).translate(term)
     deform_dir = resource_filename('deform', 'templates/')
