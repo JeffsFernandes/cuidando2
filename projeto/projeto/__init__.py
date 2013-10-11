@@ -18,7 +18,7 @@ from security import groupfinder
 def root_factory(request):
     conn = get_connection(request)
     request.db = conn.root()
-    #return appmaker(conn.root())
+    appmaker(conn.root())
     return conn.root()
 
 
@@ -35,7 +35,7 @@ def main(global_config, **settings):
         session_factory=session_factory)
 
     authn_policy = AuthTktAuthenticationPolicy(
-        secret='@#F#4f3g8fg734ffuh3498y83h34f3nwdp[]]290&',
+        secret='2398ry289$#T$#Tnykki4jh3t4t34239ryh9',
         callback=groupfinder,
         include_ip=True,
         hashalg='sha512',
@@ -44,7 +44,6 @@ def main(global_config, **settings):
     authz_policy = ACLAuthorizationPolicy()
     config.set_authentication_policy(authn_policy)
     config.set_authorization_policy(authz_policy)
-
 	
     config.add_translation_dirs(
         'colander:locale',

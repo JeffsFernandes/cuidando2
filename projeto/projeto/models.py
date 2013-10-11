@@ -1,5 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from persistent.mapping import PersistentMapping
 from persistent import Persistent
+import transaction
 
 
 class MyModel(PersistentMapping):
@@ -204,9 +208,17 @@ class Denuncia(Persistent):
         self.coment = [] 		
 		
 def appmaker(zodb_root):
-    if not 'app_root' in zodb_root:
-        app_root = MyModel()
-        zodb_root['app_root'] = app_root
-        import transaction
+    alterado = False
+    if not 'cidadaos' in zodb_root:
+        zodb_root['cidadaos'] = {}
+        alterado = True
+
+    if alterado:
         transaction.commit()
-    return zodb_root['app_root']
+
+    #if not 'app_root' in zodb_root:
+    #    app_root = MyModel()
+    #    zodb_root['app_root'] = app_root
+    #    import transaction
+    #    transaction.commit()
+    #return zodb_root['app_root']

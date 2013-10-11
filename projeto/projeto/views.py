@@ -47,7 +47,7 @@ def my_view(request):
 
 @view_config(route_name='lista', renderer='lista.slim')
 def lista(request):
-    cidadaos = request.db.values()
+    cidadaos = request.db['cidadaos'].values()
     return {
         'cidadaos': cidadaos,
     }
@@ -69,11 +69,11 @@ def cadastro(request):
 		# Criação e inserção	
         cidadao = Cidadao("","")
         cidadao = merge_session_with_post(cidadao, request.POST.items())
-        request.db[cidadao.nome] = cidadao
+        request.db['cidadaos'][cidadao.nome] = cidadao
         #request.db.commit()
         transaction.commit()
-        #request.session.flash(u"Usuário registrado com sucesso.")
-        #request.session.flash(u"Agora você já pode logar com ele.")
+        request.session.flash(u"Usuário registrado com sucesso.")
+        request.session.flash(u"Agora você já pode logar com ele.")
         return HTTPFound(location=request.route_url('lista'))
     else:
         # Apresentação do formulário
