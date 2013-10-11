@@ -36,7 +36,7 @@ def groupfinder(nome, request):
     request.jogador = jog
 
     try:
-        if nome in ['sofia','lars']:
+        if nome in ['a']:
             grupos.append("g:analise")
     except:
         pass
