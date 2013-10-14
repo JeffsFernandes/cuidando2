@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from pyramid.view import view_config
-from .models import Cidadao, MyModel
+from .models import Cidadao, UsrTree
+#from .models import Cidadao, MyModel, UsrTree
+#por que MyModel?
 from beaker.middleware import SessionMiddleware
+import warnings
 
 from pyramid.httpexceptions import (
     HTTPFound,
@@ -17,6 +20,7 @@ from pyramid.security import (
 )
 from forms import (
     merge_session_with_post,
+    record_to_appstruct,
     FormCadastrar,
     FormConfigurar,
     FormContato,
@@ -45,9 +49,6 @@ def simple_app(environ, start_response):
 
 @view_config(route_name='inicial', renderer='inicial.slim')
 def my_view(request):
-    session = request.session
-    session['name'] = 'Teste1' 
-    session.save()
     return {'project': 'projeto'}
 
 @view_config(
@@ -56,7 +57,9 @@ def my_view(request):
     permission='comum'
 )
 def lista(request):
-    cidadaos = request.db['cidadaos'].values()
+    cidadaos = request.db['usrTree'].values()
+	#teste bobo
+    #print request.db['usrTree'].minKey()
     return {
         'cidadaos': cidadaos,
     }
@@ -64,7 +67,13 @@ def lista(request):
 @view_config(route_name='cadastro', renderer='cadastro.slim')
 def cadastro(request):
     """Cadastro de usuário"""
-
+	# soh eh rodado 1 vez... tem que colocar na configurcao ou coisa assim?...
+    # Ensure that a ’userdb’ key is present
+    # in the root
+    if not request.db.has_key("usrTree"):
+        from BTrees.OOBTree import OOBTree
+        request.db["usrTree"] = OOBTree()
+		
     esquema = FormCadastrar().bind(request=request)
     esquema.title = "Cadastrar novo usuário"
     form = deform.Form(esquema, buttons=('Cadastrar',))
@@ -78,8 +87,9 @@ def cadastro(request):
 		# Criação e inserção	
         cidadao = Cidadao("","")
         cidadao = merge_session_with_post(cidadao, request.POST.items())
-        request.db['cidadaos'][cidadao.email] = cidadao
-        #request.db.commit()
+		#tchau lista
+        #request.db['cidadaos'][cidadao.email] = cidadao
+        request.db['usrTree'][cidadao.email] = cidadao
         transaction.commit()
         request.session.flash(u"Usuário registrado com sucesso.")
         request.session.flash(u"Agora você já pode logar com ele.")
@@ -97,28 +107,27 @@ def configuracao(request):
     """Configuração de usuário"""
 
     esquema = FormConfigurar().bind(request=request)
-
     esquema.title = "Configuração de usuário"
+    cidadao = Cidadao("","")
+	#como pegar o usuário do remember?
+    cidadao = request.db["usrTree"]["teste2@testecorp.com"]	
+
     form = deform.Form(esquema, buttons=('Salvar', 'Excluir conta'))
-    if 'Configurar' in request.POST:
+    if 'Salvar' in request.POST:
         # Validação do formulário
         try:
-            form.validate(request.POST.items())
+            appstruct = form.validate(request.POST.items())
         except deform.ValidationFailure as e:
             return {'form': e.render()}
         
-        # Atualizar registro - usuário logado  ??		
-        #cidadao = Cidadao("","")
-        #cidadao = merge_session_with_post(cidadao, request.POST.items())
-        #request.db[cidadao.nome] = cidadao
-        #request.db.commit()
-        #transaction.commit()
-        #request.session.flash(u"Usuário registrado com sucesso.")
-        #request.session.flash(u"Agora você já pode logar com ele.")
+        cidadao = merge_session_with_post(cidadao, request.POST.items())
+        transaction.commit()		
         return HTTPFound(location=request.route_url('lista'))
     else:
         # Apresentação do formulário
-        return {'form': form.render()}		
+        appstruct = record_to_appstruct(cidadao)
+        return{'form':form.render(appstruct=appstruct)}
+        #return {'form': form.render()}		
 		
 @view_config(route_name='contato', renderer='contato.slim')
 def contato(request):
@@ -157,19 +166,26 @@ def login(request):
     print(request.POST)
     if 'Entrar' in request.POST:
         try:
-            form.validate(request.POST.items())
-			#request.session[request.POST.items()]
-            #login = request.POST.get('login')
-            #password = request.POST.get('password')			
+            form.validate(request.POST.items())		
         except deform.ValidationFailure as e:
             return {'form': e.render()}
 
         email = request.POST.get("email")
-        headers = remember(request, email)
-        print("LOGADO!!!!!!!!!!!!!!", email)
-
-        next = request.route_url('lista')
-        return HTTPFound(location=next, headers=headers)
+        senha = request.POST.get("senha")
+        #if email in request.db["usrTree"]
+        if email in request.db["usrTree"]:
+            cidadao = Cidadao("","")
+            cidadao = request.db["usrTree"][email]
+            if cidadao.senha == senha:
+                headers = remember(request, email)
+                print("LOGADO!!!!!!!!!!!!!!", email)
+                next = request.route_url('usuario')
+                return HTTPFound(location=next, headers=headers)				
+            else:
+                warnings.warn("Email ou senha inválidos", DeprecationWarning)
+        else:
+            warnings.warn("Email ou senha inválidos", DeprecationWarning)
+        return {'form': form.render()}
     else:
         return {'form': form.render()}
     

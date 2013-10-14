@@ -3,6 +3,8 @@
 
 from persistent.mapping import PersistentMapping
 from persistent import Persistent
+from BTrees.OOBTree import OOBTree
+
 import transaction
 from pyramid.security import (
     Allow,
@@ -10,7 +12,6 @@ from pyramid.security import (
     ALL_PERMISSIONS,
     )
 from pyramid_zodbconn import get_connection
-
 
 class RootFactory(object):
     __acl__ = [
@@ -26,10 +27,11 @@ class RootFactory(object):
         #return None
         #return conn.root()
 
-
 class MyModel(PersistentMapping):
     __parent__ = __name__ = None
 
+class UsrTree(OOBTree):
+    __usr__ = __name__ = "usrTree"	
 
 class Cidadao(PersistentMapping):
 
@@ -37,7 +39,7 @@ class Cidadao(PersistentMapping):
         self,
         nome,
         senha,
-		id="",
+        id="",
         nome_completo="",
         genero="",
         nascimento="",

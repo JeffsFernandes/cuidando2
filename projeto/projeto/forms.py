@@ -112,7 +112,7 @@ class FormConfigurar(CSRFSchema):
         String(),
         validator=All(
             Length(max=32),
-            #Function(verif_nome_unico, u"Nome já cadastrado"),
+            #Function(verif_email_unico, u"Nome já cadastrado"),
             Regex("^(\w)*$", "Usar apenas letras, números ou _"),
         ),
         missing=unicode(''),		
@@ -274,6 +274,7 @@ class FormLogin(CSRFSchema):
     senha = SchemaNode(
         String(),
         validator=Length(min=5, max=32),
+        widget=widget.PasswordWidget(),
         description='Digite sua senha'
     )
 
