@@ -102,9 +102,9 @@ class FormCadastrar(CSRFSchema):
     
     confirmar = SchemaNode(
         Boolean(),	
-        description='Aceitar termos e condições',
-        widget=widget.CheckboxWidget(),
+        #description='Aceitar termos e condições',
         label='Aceitar termos e condições',
+        widget=widget.CheckboxWidget(),
 		title='Confirmar',
         validator=Function(lambda x: x, u'É necessário aceitar as condições'),
     )			
