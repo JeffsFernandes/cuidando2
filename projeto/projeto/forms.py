@@ -255,7 +255,7 @@ class FormMapa(CSRFSchema):
         description='Digite sua mensagem',
         title='Mensagem',
         validator=Length(max=100),
-        widget=widget.TextAreaWidget(rows=10, cols=60)
+        widget=widget.TextAreaWidget(rows=10, cols=60, css_class='form-control')
     )
 
 class FormOrcamento(CSRFSchema):
