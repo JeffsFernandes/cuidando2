@@ -11,6 +11,7 @@ from colander import (
     Length,
     Regex,
     Function,
+    OneOf,
     Email,
     Mapping,
     All,
@@ -101,9 +102,11 @@ class FormCadastrar(CSRFSchema):
     
     confirmar = SchemaNode(
         Boolean(),	
+        description='Aceitar termos e condições',
+        widget=widget.CheckboxWidget(),
         label='Aceitar termos e condições',
 		title='Confirmar',
-        widget=widget.CheckboxWidget(),
+        validator=Function(lambda x: x, u'É necessário aceitar as condições'),
     )			
 
 class FormConfigurar(CSRFSchema):
