@@ -10,11 +10,25 @@
 	<link rel="stylesheet" href="MarkerCluster.Default.css" />
 	<script src="leaflet.markercluster-src.js"></script>
 	<script src="saida.js"></script>
+	<script type="text/javascript">var teste = new Array();</script>
+
 </head>
 
 <body>
 	<div id="map" style="height: 800px;"></div>
 	<h1>Mapa</h1>
+	<!-- Esse select mais tarde será gerado por um javascript, para que ele puxe todos os tipos de orçamentos que temos na base de dados. !-->
+	<select>
+		<option>Selecione uma função: </option>
+		<option value="Saúde">Saúde</option>
+		<option value="Previdência Social">Previdência Social</option>
+		<option value="Assistência Social">Assistência Social</option>
+		<option value="Encargos Especiais">Encargos Especiais</option>
+		<option value="Urbanismo">Urbanismo</option>
+		<option value="Legislativa">Legislativa</option>
+		<option value="Administração">Admnistração</option>
+	</select>
+	<input type="button" onClick="filtra()" value="Filtrar">
 	<script>
 
 		var map = L.map('map').setView([-23,-46], 10);
@@ -47,19 +61,53 @@
 	//	map.on('click', onMapClick);
 
 	</script>
+		<script type="text/javascript">
+		function filtra(){
+			/* 
+			Essa funcao devera receber como parametro de um select, qual o filtro que o usuario quer.
+
+			*/
+			var markers = L.markerClusterGroup();
+			//alert(addressPoints.length);
+			for (var j = 0; j < addressPoints.length; j++) {
+				//alert(j);
+				var a = addressPoints[j];
+				//alert(j);
+				//var title = a[2];
+				var filtro = a[3];
+				//alert("TESTE");
+				//alert(filtro + "=" + "Saúde");
+				if( filtro != 'Saúde'){
+					//alert("IF");
+					map.removeLayer(teste[j]); //Parte que deveria remover as layers do mapa.
+				}
+				//alert(j);
+				
+			}
+			
+			//map.removeLayer(markers);
+			//map.addLayer(markers);
+		}
+
+	</script>
+
 	<script type="text/javascript">
 
 		var markers = L.markerClusterGroup();
-		
+
 		for (var i = 0; i < addressPoints.length; i++) {
 			var a = addressPoints[i];
 			var title = a[2];
 			var marker = L.marker(new L.LatLng(a[0], a[1]), { title: title });
+			teste.push(marker); //Tentei colocar tudo em um array auxiliar para depois excluir as layers a partir dele, mas não deu certo..
 			marker.bindPopup(title);
 			markers.addLayer(marker);
 		}
 
 		map.addLayer(markers);
+
+
+
 
 	</script>
 </body>
