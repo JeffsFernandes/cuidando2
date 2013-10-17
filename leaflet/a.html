@@ -18,17 +18,11 @@
 	<div id="map" style="height: 800px;"></div>
 	<h1>Mapa</h1>
 	<!-- Esse select mais tarde será gerado por um javascript, para que ele puxe todos os tipos de orçamentos que temos na base de dados. !-->
-	<select>
-		<option>Selecione uma função: </option>
-		<option value="Saúde">Saúde</option>
-		<option value="Previdência Social">Previdência Social</option>
-		<option value="Assistência Social">Assistência Social</option>
-		<option value="Encargos Especiais">Encargos Especiais</option>
-		<option value="Urbanismo">Urbanismo</option>
-		<option value="Legislativa">Legislativa</option>
-		<option value="Administração">Admnistração</option>
-	</select>
+	<div id="select">
+
+	</div>
 	<input type="button" onClick="filtra()" value="Filtrar">
+	
 	<script>
 
 		var map = L.map('map').setView([-23,-46], 10);
@@ -92,18 +86,32 @@
 	</script>
 
 	<script type="text/javascript">
-
+		var newDiv = document.getElementById('select');
+		var selectHTML = "";
+		selectHTML="<select>";
+		var ant = "";
+		var aux = new Array();
+		var aux2 = new Array();
+		var arrayFinal = new Array();
+		var j = 0;
 		var markers = L.markerClusterGroup();
 
 		for (var i = 0; i < addressPoints.length; i++) {
 			var a = addressPoints[i];
 			var title = a[2];
+			var filtro = a[3];
+			if(filtro != ant ){
+				ant = filtro;
+				j++
+				selectHTML += "<option value='"+filtro+"'>"+filtro+"</option>"; //Joga todos as opcoes de filtro no select (Existe repeticoes)
+			}
 			var marker = L.marker(new L.LatLng(a[0], a[1]), { title: title });
 			teste.push(marker); //Tentei colocar tudo em um array auxiliar para depois excluir as layers a partir dele, mas não deu certo..
 			marker.bindPopup(title);
 			markers.addLayer(marker);
 		}
-
+		selectHTML += "</select>";
+		newDiv.innerHTML = selectHTML;
 		map.addLayer(markers);
 
 
