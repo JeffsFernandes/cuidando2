@@ -17,9 +17,7 @@
 <body>
 	<div id="map" style="height: 800px;"></div>
 	<h1>Mapa</h1>
-	<!-- Esse select mais tarde será gerado por um javascript, para que ele puxe todos os tipos de orçamentos que temos na base de dados. !-->
 	<div id="select">
-
 	</div>
 	<input type="button" onClick="filtra()" value="Filtrar">
 	
@@ -57,30 +55,10 @@
 	</script>
 		<script type="text/javascript">
 		function filtra(){
-			/* 
+			/* 	
 			Essa funcao devera receber como parametro de um select, qual o filtro que o usuario quer.
-
 			*/
-			var markers = L.markerClusterGroup();
-			//alert(addressPoints.length);
-			for (var j = 0; j < addressPoints.length; j++) {
-				//alert(j);
-				var a = addressPoints[j];
-				//alert(j);
-				//var title = a[2];
-				var filtro = a[3];
-				//alert("TESTE");
-				//alert(filtro + "=" + "Saúde");
-				if( filtro != 'Saúde'){
-					//alert("IF");
-					map.removeLayer(teste[j]); //Parte que deveria remover as layers do mapa.
-				}
-				//alert(j);
-				
-			}
 			
-			//map.removeLayer(markers);
-			//map.addLayer(markers);
 		}
 
 	</script>
@@ -89,9 +67,9 @@
 		var newDiv = document.getElementById('select');
 		var selectHTML = "";
 		selectHTML="<select>";
+		selectHTML+="<option value=''>Selecione uma opção:</option>"
 		var ant = "";
 		var aux = new Array();
-		var aux2 = new Array();
 		var arrayFinal = new Array();
 		var j = 0;
 		var markers = L.markerClusterGroup();
@@ -101,14 +79,34 @@
 			var title = a[2];
 			var filtro = a[3];
 			if(filtro != ant ){
-				ant = filtro;
+				ant = filtro; //Evitar de colocar argumentos desnecessarios no array
+				aux[j] = filtro;
 				j++
-				selectHTML += "<option value='"+filtro+"'>"+filtro+"</option>"; //Joga todos as opcoes de filtro no select (Existe repeticoes)
 			}
 			var marker = L.marker(new L.LatLng(a[0], a[1]), { title: title });
 			teste.push(marker); //Tentei colocar tudo em um array auxiliar para depois excluir as layers a partir dele, mas não deu certo..
 			marker.bindPopup(title);
 			markers.addLayer(marker);
+		}
+		for(var k=0; k<aux.length; k++){
+			for(var u=k+1; u<aux.length; u++){
+				if(aux[k] == aux[u]){
+					aux[u] = "";
+				}
+			}
+		}
+		/* Transferindo dados do aux para o Array Final, retirando todos valores com espaço em branco, porem tendo alguns undefined no meio */ 
+		for(var r =0; r < aux.length; r++){
+			if(aux[r] != ""){
+				arrayFinal[r] = aux[r];	
+			}
+					
+		}
+		/* Realizando um foreach para eliminar todos os undefined e inserir de vez as funções no select. */
+		var q = 0;
+		arrayFinal.sort();
+		for(q in arrayFinal){
+			selectHTML += "<option value='"+arrayFinal[q]+"'>"+arrayFinal[q]+"</option>";
 		}
 		selectHTML += "</select>";
 		newDiv.innerHTML = selectHTML;
