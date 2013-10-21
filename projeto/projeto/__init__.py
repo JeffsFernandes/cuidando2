@@ -26,6 +26,8 @@ def main(global_config, **settings):
         settings=settings,
         #session_factory=session_factory,
     )
+    config.include('pyramid_chameleon')
+    config.include('pyramid_mako')
 
     authn_policy = AuthTktAuthenticationPolicy(
         secret='2398ry289$#T$#Tnykki4jh3t4t34239ryh9',

@@ -14,6 +14,8 @@ requires = [
     'pyramid_debugtoolbar',
     'waitress',
     'ZODB3',
+    'pyramid_mako',
+    'pyramid_chameleon',
     'plim',
     'deform',
     'pyramid_deform',
