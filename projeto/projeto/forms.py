@@ -99,13 +99,12 @@ class FormCadastrar(CSRFSchema):
         widget=widget.CheckedPasswordWidget(size=20),
         description='Digite sua senha (no mínimo 5 caracteres) e a confirme'
     )
-    
     confirmar = SchemaNode(
         Boolean(),	
         #description='Aceitar termos e condições',
         label='Aceitar termos e condições',
         widget=widget.CheckboxWidget(),
-		title='Confirmar',
+        title='Confirmar',
         validator=Function(lambda x: x, u'É necessário aceitar as condições'),
     )			
 
