@@ -232,8 +232,8 @@ class Denuncia(Persistent):
 		
 def appmaker(zodb_root):
     alterado = False
-    if not 'cidadaos' in zodb_root:
-        zodb_root['cidadaos'] = PersistentMapping()
+    if not 'usrTree' in zodb_root:
+        zodb_root['usrTree'] = PersistentMapping()
         alterado = True
 
     if alterado:

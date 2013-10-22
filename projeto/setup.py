@@ -21,6 +21,10 @@ requires = [
     'pyramid_deform',
     'pyramid_beaker',
     'deform_bootstrap',
+    #'repoze.folder',
+    #'repoze.retry',
+    #'repoze.tm2==1.0',
+    #'repoze.zodbconn',
     ]
 
 setup(name='projeto',
