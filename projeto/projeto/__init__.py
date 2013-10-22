@@ -19,12 +19,12 @@ def main(global_config, **settings):
     """
     #ja esta no dev.ini
     #config.include('pyramid_beaker')
-    #session_factory = session_factory_from_settings(settings)  
+    session_factory = session_factory_from_settings(settings)  
 
     config = Configurator(
         root_factory=RootFactory,
         settings=settings,
-        #session_factory=session_factory,
+        session_factory=session_factory,
     )
 
     authn_policy = AuthTktAuthenticationPolicy(

@@ -87,7 +87,7 @@ def deferred_verif_email_unico(node, kw):
     )
 
 			
-class FormCadastrar(Schema):
+class FormCadastrar(CSRFSchema):
     nome = SchemaNode(
         String(),
         validator=All(
