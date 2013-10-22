@@ -3,6 +3,7 @@
 
 from deform import widget
 from pyramid_deform import CSRFSchema
+import colander
 from colander import (
     MappingSchema,
     SchemaNode,
@@ -74,6 +75,17 @@ notificacoes = (
 tipoNot = (
     ('ponto', 'Atualizações de pontos próximos ao endereço cadastrado'),
     ('evento', 'Eventos próximos ao endereço cadastrado'))
+
+
+@colander.deferred
+def deferred_verif_email_unico(node, kw):
+    request = kw.get('request')
+    emails = request.db["usrTree"].keys()
+    return All(
+        Email('E-mail inválido'),
+        Function(lambda x: not (x in emails), u"Email já cadastrado")
+    )
+
 			
 class FormCadastrar(Schema):
     nome = SchemaNode(
@@ -87,7 +99,7 @@ class FormCadastrar(Schema):
     )
     email = SchemaNode(
         String(),
-		validator=Email('E-mail inválido'),
+		validator=deferred_verif_email_unico,
         description='Digite seu e-mail',
         widget=widget.CheckedInputWidget(
             subject='Email',
