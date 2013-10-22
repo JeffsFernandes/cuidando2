@@ -5,7 +5,7 @@
 def groupfinder(identificador, request):
     grupos = []
 
-    cid = request.db['cidadaos'].get(identificador)
+    cid = request.db['usrTree'].get(identificador)
     request.cidadao = cid
     if cid is not None:
         grupos.append('g:cidadao')
