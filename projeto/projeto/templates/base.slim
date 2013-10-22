@@ -47,13 +47,13 @@ html
                 a href="${request.route_url('configuracao')}" Configurar
               li
                 a href="${request.route_url('logout')}" Sair	
-            /-else
-            li
-              a href="${request.route_url('cadastro')}" Cadastrar				
-            li
-              a href="${request.route_url('sobre')}" Sobre				  
-            li
-              a href="${request.route_url('contato')}" Contato					   
+            -else
+              li
+                a href="${request.route_url('cadastro')}" Cadastrar				
+              li
+                a href="${request.route_url('sobre')}" Sobre				  
+              li
+                a href="${request.route_url('contato')}" Contato					   
 					   
 	.container
 	  h1 Cuidando do meu bairro
