@@ -6,6 +6,7 @@ from pyramid_deform import CSRFSchema
 from colander import (
     MappingSchema,
     SchemaNode,
+    Schema,
     String,
     Integer,
     Length,
@@ -74,7 +75,7 @@ tipoNot = (
     ('ponto', 'Atualizações de pontos próximos ao endereço cadastrado'),
     ('evento', 'Eventos próximos ao endereço cadastrado'))
 			
-class FormCadastrar(CSRFSchema):
+class FormCadastrar(Schema):
     nome = SchemaNode(
         String(),
         validator=All(
