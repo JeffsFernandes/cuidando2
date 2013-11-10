@@ -294,18 +294,19 @@ class FormLogin(CSRFSchema):
     )
 
 class FormInserirP(CSRFSchema):
-    titulo = SchemaNode(
+    atividade = SchemaNode(
         String(),
         validator=All(
             Length(max=32),
             Regex("^(\w)*$", "Usar apenas letras, números ou _"),
         ),
+        title='Título',		
         description='Nome do local')
-    comentario = SchemaNode(
+    descricao = SchemaNode(
         String(),
         missing=unicode(''),		
         description='Comente sobre o orçamento',
-        title='Comentário',
+        title='Descrição',
         validator=Length(max=100),
         widget=widget.TextAreaWidget(rows=10, cols=60)
     )		

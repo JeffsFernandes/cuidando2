@@ -96,26 +96,30 @@ class Atividade(Persistent):
 
     def __init__(
         self,
-        atividade,
-        descricao,
+        atividade ="",
+        descricao ="",
 
     ):
 
         self.atividade = atividade
         self.descricao = descricao
-
+#persistent ou persistent mapping??
 class Atividade_cidadao(Persistent):
 
     def __init__(
         self,
-        cidadao,
-        atividade,
-        data,
-        tipo,
+        cidadao ="",
+		#nao lembro o que era essa atividade... sao so titulo??
+		#atividade_cidadao deveria herdar de atividade
+        atividade ="",
+        descricao ="",
+        data ="",
+        tipo ="",
 
     ):
         self.cidadao = cidadao
         self.atividade = atividade
+        self.descricao = descricao		
         self.data = data
         self.tipo = tipo
 
@@ -127,13 +131,13 @@ class Atividade_orcamento(Persistent):
 
     def __init__(
         self,
-        atividade,
-        orcado,
-        atualizado,
-        ano,
-        empenhado,
-        liquidado,
-        orgao,
+        atividade = "",
+        orcado ="",
+        atualizado = "",
+        ano="",
+        empenhado="",
+        liquidado="",
+        orgao="",
 
     ):
 
@@ -200,7 +204,7 @@ class Midia_comentario(Midia):
         self,
         comentario,
         data,
-        comentarioPai,
+        comentarioPai="",
 
     ):
 

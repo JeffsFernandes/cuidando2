@@ -39,21 +39,22 @@ html
             li
               a href="${request.route_url('orcamento')}" Orçamento	
             li
-              a href="${request.route_url('login')}" Login		
-            -if hasattr(request, 'cidadao')
+              a href="${request.route_url('login')}" Login	
+            /parou de funcionar... vai saber.....			  
+            -if hasattr(request, 'cidadao')			
               li			  
                 a href="${request.route_url('usuario')}" Usuário		
               li
                 a href="${request.route_url('configuracao')}" Configurar
               li
                 a href="${request.route_url('logout')}" Sair	
-            -else
+            -if not hasattr(request, 'cidadao')	
               li
                 a href="${request.route_url('cadastro')}" Cadastrar				
-              li
-                a href="${request.route_url('sobre')}" Sobre				  
-              li
-                a href="${request.route_url('contato')}" Contato					   
+            li
+              a href="${request.route_url('sobre')}" Sobre				  
+            li
+              a href="${request.route_url('contato')}" Contato					   
 					   
 	.container
 	  h1 Cuidando do meu bairro

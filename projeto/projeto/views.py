@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pyramid.view import view_config
-from .models import Cidadao, UsrTree
+from .models import Cidadao, UsrTree, Atividade_cidadao
 #from .models import Cidadao, MyModel, UsrTree
 #por que MyModel?
 from beaker.middleware import SessionMiddleware
@@ -34,19 +34,6 @@ from forms import (
 import deform
 import transaction
 
-def simple_app(environ, start_response):
-    # Get the session object from the environ
-    session = environ['beaker.session']
-
-    # Check to see if a value is in the session
-    user = 'logged_in' in session
-
-    # Set some other session variable
-    session['user_id'] = 10
-
-    start_response('200 OK', [('Content-type', 'text/plain')])
-    return ['User is logged in: %s' % user]
-
 @view_config(route_name='inicial', renderer='inicial.slim')
 def my_view(request):
     return {'project': 'projeto'}
@@ -58,10 +45,12 @@ def my_view(request):
 )
 def lista(request):
     cidadaos = request.db['usrTree'].values()
+    atividades = request.db['atvTree'].values()
 	#teste bobo
     #print request.db['usrTree'].minKey()
     return {
         'cidadaos': cidadaos,
+        'atividades': atividades,
     }
 	
 @view_config(route_name='cadastro', renderer='cadastro.slim')
@@ -110,7 +99,7 @@ def configuracao(request):
     esquema.title = "Configuração de usuário"
     cidadao = Cidadao("","")
 	#como pegar o usuário do remember?
-    cidadao = request.db["usrTree"]["teste2@testecorp.com"]	
+    cidadao = request.db["usrTree"][authenticated_userid(request)]	
 
     form = deform.Form(esquema, buttons=('Salvar', 'Excluir conta'))
     if 'Salvar' in request.POST:
@@ -156,7 +145,6 @@ def logout(request):
     #request.session.pop_flash()
     return HTTPFound(location=request.route_url('inicial'), headers=headers)
 
-
 @view_config(route_name='login', renderer='login.slim')
 def login(request):
 
@@ -172,13 +160,11 @@ def login(request):
 
         email = request.POST.get("email")
         senha = request.POST.get("senha")
-        #if email in request.db["usrTree"]
         if email in request.db["usrTree"]:
             cidadao = Cidadao("","")
             cidadao = request.db["usrTree"][email]
             if cidadao.senha == senha:
                 headers = remember(request, email)
-                print("LOGADO!!!!!!!!!!!!!!", email)
                 next = request.route_url('usuario')
                 return HTTPFound(location=next, headers=headers)				
             else:
@@ -261,12 +247,28 @@ def inserir_ponto(request):
     esquema = FormInserirP().bind(request=request)
     esquema.title = "Inserir ponto no mapa"
     form = deform.Form(esquema, buttons=('Inserir', 'Cancelar'))
-    if 'inserir_ponto' in request.POST:
+	
+    if not request.db.has_key("atvTree"):
+        from BTrees.OOBTree import OOBTree
+        request.db["atvTree"] = OOBTree()
+		
+    if 'Inserir' in request.POST:
         try:
             form.validate(request.POST.items())
         except deform.ValidationFailure as e:
             return {'form': e.render()}
 
+        if(authenticated_userid(request)):	
+		    # Criação e inserção	
+            atividade = Atividade_cidadao("","")
+            atividade = merge_session_with_post(atividade, request.POST.items())
+		    #inserir id para a atividade?
+            atividade.data = "09-11-2013"
+            atividade.cidadao = authenticated_userid(request)
+            request.db['atvTree'][atividade.atividade] = atividade
+            transaction.commit()
+            request.session.flash(u"Atividade de usuário cadastrada com sucesso.")
+			
         return HTTPFound(location=request.route_url('lista'))
     else:
         return {'form': form.render()}
