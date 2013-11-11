@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from pyramid.view import view_config
-from .models import Cidadao, UsrTree, Atividade_cidadao
+from .models import Cidadao, Atividade_cidadao
+#from .models import Cidadao, UsrTree, Atividade_cidadao
 #from .models import Cidadao, MyModel, UsrTree
 #por que MyModel?
 from beaker.middleware import SessionMiddleware
+from datetime import datetime
 import warnings
 
 from pyramid.httpexceptions import (
@@ -29,7 +31,9 @@ from forms import (
     FormLogin,	
     FormMapa,
     FormInserirP,
-    FormOrcamento,	
+    FormOrcamento,
+    FormRecadSenha,	
+    FormRSenha,
 )
 import deform
 import transaction
@@ -98,7 +102,6 @@ def configuracao(request):
     esquema = FormConfigurar().bind(request=request)
     esquema.title = "Configuração de usuário"
     cidadao = Cidadao("","")
-	#como pegar o usuário do remember?
     cidadao = request.db["usrTree"][authenticated_userid(request)]	
 
     form = deform.Form(esquema, buttons=('Salvar', 'Excluir conta'))
@@ -150,8 +153,9 @@ def login(request):
 
     esquema = FormLogin().bind(request=request)
     esquema.title = "Login"
-    form = deform.Form(esquema, buttons=('Entrar', 'Esqueci a senha'))
-    print(request.POST)
+	#botoes nao aceitam frases como label = "esqueci a senha"
+    form = deform.Form(esquema, buttons=('Entrar', 'Esqueci'))
+
     if 'Entrar' in request.POST:
         try:
             form.validate(request.POST.items())		
@@ -172,6 +176,8 @@ def login(request):
         else:
             warnings.warn("Email ou senha inválidos", DeprecationWarning)
         return {'form': form.render()}
+    elif 'Esqueci' in request.POST:  
+        return HTTPFound(location=request.route_url('r_senha'))
     else:
         return {'form': form.render()}
     
@@ -263,7 +269,7 @@ def inserir_ponto(request):
             atividade = Atividade_cidadao("","")
             atividade = merge_session_with_post(atividade, request.POST.items())
 		    #inserir id para a atividade?
-            atividade.data = "09-11-2013"
+            atividade.data = datetime.now()
             atividade.cidadao = authenticated_userid(request)
             request.db['atvTree'][atividade.atividade] = atividade
             transaction.commit()
@@ -304,3 +310,61 @@ def termos(request):
         return HTTPFound(location=request.route_url('lista'))
     else:
         return {'form': form.render()}
+
+@view_config(
+    route_name='rcad_senha',
+    renderer='rcad_senha.slim',
+    permission='basica'
+)
+def rcad_senha(request):
+    """Redefinir senha de usuário"""
+
+    esquema = FormRecadSenha().bind(request=request)
+    esquema.title = "Redefinir senha"
+    cidadao = Cidadao("","")
+    
+    form = deform.Form(esquema, buttons=('Salvar',))
+    if 'Salvar' in request.POST:
+        # Validação do formulário
+        try:
+            appstruct = form.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+        #validar token, se ok, merge session
+        cidadao = merge_session_with_post(cidadao, request.POST.items())
+        transaction.commit()		
+        return HTTPFound(location=request.route_url('usuario'))
+    else:
+        return{'form':form.render()}
+		
+@view_config(
+    route_name='r_senha',
+    renderer='r_senha.slim',
+    permission='comum'
+)
+def r_senha(request):
+    """Reenviar senha de usuário"""
+
+    esquema = FormRSenha().bind(request=request)
+    esquema.title = "Reenviar senha"
+    
+    form = deform.Form(esquema, buttons=('Enviar',))
+    if 'Enviar' in request.POST:
+        # Validação do formulário
+        try:
+            appstruct = form.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+			
+        email = request.POST.get("email")
+
+        if email in request.db["usrTree"]:
+            #enviar email com token, armazenar esse token
+            headers = remember(request, email)
+            return HTTPFound(location=request.route_url('rcad_senha'), headers=headers)				
+        else:
+            warnings.warn("Email ou senha inválidos", DeprecationWarning)
+		
+        return HTTPFound(location=request.route_url('rcad_senha'))
+    else:
+        return {'form': form.render()}		

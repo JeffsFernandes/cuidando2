@@ -17,8 +17,6 @@ from security import groupfinder
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
-    #ja esta no dev.ini
-    #config.include('pyramid_beaker')
     session_factory = session_factory_from_settings(settings)  
 
     config = Configurator(
@@ -42,7 +40,7 @@ def main(global_config, **settings):
         'colander:locale',
         'deform:locale',
     )
-    #config.set_session_factory(session_factory)
+
     def translator(term):
         return get_localizer(get_current_request()).translate(term)
     deform_dir = resource_filename('deform', 'templates/')
@@ -71,6 +69,8 @@ def main(global_config, **settings):
     config.add_route('inserir_ponto', '/inserir_ponto')	
     config.add_route('privacidade', '/privacidade')	
     config.add_route('termos', '/termos')	
+    config.add_route('r_senha', '/r_senha')
+    config.add_route('rcad_senha', '/rcad_senha')		
 	
     config.scan()
     return config.make_wsgi_app()

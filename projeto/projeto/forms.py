@@ -86,7 +86,7 @@ def deferred_verif_email_unico(node, kw):
         Function(lambda x: not (x in emails), u"Email já cadastrado")
     )
 
-			
+
 class FormCadastrar(CSRFSchema):
     nome = SchemaNode(
         String(),
@@ -283,9 +283,9 @@ class FormOrcamento(CSRFSchema):
 class FormLogin(CSRFSchema):
     email = SchemaNode(
         String(),
-		validator=Email('E-mail inválido'),
+        validator=Email('E-mail inválido'),
         description='Digite seu e-mail'
-	)	
+    )	
     senha = SchemaNode(
         String(),
         validator=Length(min=5, max=32),
@@ -310,3 +310,26 @@ class FormInserirP(CSRFSchema):
         validator=Length(max=100),
         widget=widget.TextAreaWidget(rows=10, cols=60)
     )		
+
+class FormRecadSenha(CSRFSchema):
+
+    token = SchemaNode(
+        String(),
+        missing=unicode(''),		
+        description='Digite o código enviado pelo email'
+    )
+
+    senha = SchemaNode(
+        String(),
+        missing=unicode(''),		
+        validator=Length(min=5, max=32),
+        widget=widget.CheckedPasswordWidget(size=20),
+        description='Alterar sua senha (no mínimo 5 caracteres) e a confirme'
+    )		
+class FormRSenha(CSRFSchema):
+
+    email = SchemaNode(
+        String(),
+        validator=Email('E-mail inválido'),
+        description='Digite seu e-mail'
+    )	
