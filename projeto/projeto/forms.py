@@ -33,12 +33,19 @@ def merge_session_with_post(session, post):
     for key, value in post:
         setattr(session, key, value)
     return session
-	
+#Define os gêneros possíveis na configuração do perfil do usuário	
 generos = (
     ('', '-Selecionar-'),
     ('fem', 'Feminino'),
     ('mas', 'Masculino')
-)	
+)
+#Define os tipos de pontos que o usuário pode inserir no mapa
+tipoLocal = (
+    ('coment', 'Comentário'),
+    ('denun', 'Denúncia'),
+    ('perg', 'Pergunta')
+)		
+#Define os estados que o usuário pode inserir no seu endereço - configuração do usuário
 estados = (
     ('', '-Selecionar-'),
     ('AC','Acre'),
@@ -68,14 +75,15 @@ estados = (
     ('SP','São Paulo'),
     ('SE','Sergipe'),
     ('TO','Tocantins')
-)	
+)
+#Define a lista de meios de notificações para o usuário	
 notificacoes = (
     ('email', 'E-mail'),
     ('site', 'Site'))
+#Define quais tipos de notificação o usuário receberá
 tipoNot = (
     ('ponto', 'Atualizações de pontos próximos ao endereço cadastrado'),
     ('evento', 'Eventos próximos ao endereço cadastrado'))
-
 
 @colander.deferred
 def deferred_verif_email_unico(node, kw):
@@ -85,7 +93,6 @@ def deferred_verif_email_unico(node, kw):
         Email('E-mail inválido'),
         Function(lambda x: not (x in emails), u"Email já cadastrado")
     )
-
 
 class FormCadastrar(CSRFSchema):
     nome = SchemaNode(
@@ -157,9 +164,9 @@ class FormConfigurar(CSRFSchema):
     foto = SchemaNode(
         String(),
 	    #FileData(),
-        #widget=widget.FileUploadWidget(tmpstore),
+        #widget=.widget.FileUploadWidget(tmpstore, item_css_class='mapped_widget_custom_class')		
         missing=unicode(''),		
-        description='Carregar foto'
+        description='Carregar foto'	
     )   
 		
     rua = SchemaNode(
@@ -223,7 +230,6 @@ class FormContato(CSRFSchema):
         validator=All(
             Length(max=32),
             #Function(verif_nome_unico, u"Nome já cadastrado"),
-            Regex("^(\w)*$", "Usar apenas letras, números ou _"),
         )
     )	
     email = SchemaNode(
@@ -238,28 +244,8 @@ class FormContato(CSRFSchema):
         title='Mensagem',
         validator=Length(max=100),
         widget=widget.TextAreaWidget(rows=10, cols=60)
-    )						
-
-class FormSobre(CSRFSchema):
-    mensagem = SchemaNode(
-        String(),
-        missing=unicode(''),		
-        description='Digite sua mensagem',
-        title='Mensagem',
-        validator=Length(max=100),
-        widget=widget.TextAreaWidget(rows=10, cols=60)
-    )				
+    )								
 	
-class FormUsuario(CSRFSchema):
-    mensagem = SchemaNode(
-        String(),
-        missing=unicode(''),		
-        description='Digite sua mensagem',
-        title='Mensagem',
-        validator=Length(max=100),
-        widget=widget.TextAreaWidget(rows=10, cols=60)
-    )
-
 class FormMapa(CSRFSchema):
     mensagem = SchemaNode(
         String(),
@@ -302,13 +288,41 @@ class FormInserirP(CSRFSchema):
         ),
         title='Título',		
         description='Nome do local')
+    endereco = SchemaNode(
+        String(),
+        missing=unicode(''),		
+        description='Endereço do local',
+        title='Endereço',
+        validator=Length(max=100),
+        widget=widget.TextAreaWidget(rows=1, cols=60)
+    )		
+    tipo = SchemaNode(
+        String(),
+        missing=unicode(''),
+        widget=widget.SelectWidget(values=tipoLocal),
+        title = "Gênero",		
+    )
+    foto = SchemaNode(
+        String(),
+	    #FileData(),
+        #widget=widget.FileUploadWidget(tmpstore),
+        missing=unicode(''),		
+        description='Carregar foto'
+    )  
+    video = SchemaNode(
+        String(),
+	    #FileData(),
+        #widget=widget.FileUploadWidget(tmpstore),
+        missing=unicode(''),		
+        description='Carregar vídeo'
+    )    	
     descricao = SchemaNode(
         String(),
         missing=unicode(''),		
         description='Comente sobre o orçamento',
         title='Descrição',
         validator=Length(max=100),
-        widget=widget.TextAreaWidget(rows=10, cols=60)
+        widget=widget.TextAreaWidget(rows=10, cols=60)		
     )		
 
 class FormRecadSenha(CSRFSchema):
@@ -325,7 +339,8 @@ class FormRecadSenha(CSRFSchema):
         validator=Length(min=5, max=32),
         widget=widget.CheckedPasswordWidget(size=20),
         description='Alterar sua senha (no mínimo 5 caracteres) e a confirme'
-    )		
+    )	
+	
 class FormRSenha(CSRFSchema):
 
     email = SchemaNode(

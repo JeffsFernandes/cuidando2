@@ -26,8 +26,6 @@ from forms import (
     FormCadastrar,
     FormConfigurar,
     FormContato,
-    FormSobre,
-    FormUsuario,
     FormLogin,	
     FormMapa,
     FormInserirP,
@@ -50,8 +48,6 @@ def my_view(request):
 def lista(request):
     cidadaos = request.db['usrTree'].values()
     atividades = request.db['atvTree'].values()
-	#teste bobo
-    #print request.db['usrTree'].minKey()
     return {
         'cidadaos': cidadaos,
         'atividades': atividades,
@@ -104,7 +100,7 @@ def configuracao(request):
     cidadao = Cidadao("","")
     cidadao = request.db["usrTree"][authenticated_userid(request)]	
 
-    form = deform.Form(esquema, buttons=('Salvar', 'Excluir conta'))
+    form = deform.Form(esquema, buttons=('Salvar', 'Excluir'))
     if 'Salvar' in request.POST:
         # Validação do formulário
         try:
@@ -114,28 +110,49 @@ def configuracao(request):
         
         cidadao = merge_session_with_post(cidadao, request.POST.items())
         transaction.commit()		
-        return HTTPFound(location=request.route_url('lista'))
+        return HTTPFound(location=request.route_url('usuario'))
+    elif 'Excluir' in request.POST:
+        del request.db["usrTree"][authenticated_userid(request)]
+        transaction.commit()
+        headers = forget(request)
+        return HTTPFound(location=request.route_url('inicial'))		
     else:
         # Apresentação do formulário
         appstruct = record_to_appstruct(cidadao)
-        return{'form':form.render(appstruct=appstruct)}
-        #return {'form': form.render()}		
+        return{'form':form.render(appstruct=appstruct)}	
 		
 @view_config(route_name='contato', renderer='contato.slim')
 def contato(request):
     """Contato"""
-
+    # Import smtplib for the actual sending function
+    import smtplib
+	
     esquema = FormContato().bind(request=request)
     esquema.title = "Entre em contato com o Cuidando"
     form = deform.Form(esquema, buttons=('Enviar',))
-    if 'Contato' in request.POST:
+    if 'Enviar' in request.POST:
         # Validação do formulário
         try:
             form.validate(request.POST.items())
         except deform.ValidationFailure as e:
             return {'form': e.render()}
 
-        return HTTPFound(location=request.route_url('lista'))
+        sender = request.POST.get("email")
+        receivers = ['silvailziane@yahoo.com.br']	
+        message = request.POST.get("assunto")		
+        						
+        try:
+            #s = smtplib.SMTP( [host [, port [, local_hostname]]] )
+            s = smtplib.SMTP('pop.mail.yahoo.com.br',587)
+            smtpObj.sendmail(sender, receivers, message)	
+            s.quit()	        
+            print "Successfully sent email"
+		#except SMTPException:
+        except:
+            print "Error: unable to send email"		
+      
+		
+        return HTTPFound(location=request.route_url('inicial'))
     else:
         # Apresentação do formulário
         return {'form': form.render()}
@@ -154,6 +171,7 @@ def login(request):
     esquema = FormLogin().bind(request=request)
     esquema.title = "Login"
 	#botoes nao aceitam frases como label = "esqueci a senha"
+    #form = deform.Form(esquema, buttons=('Entrar', 'Esqueci a senha'))
     form = deform.Form(esquema, buttons=('Entrar', 'Esqueci'))
 
     if 'Entrar' in request.POST:
@@ -176,44 +194,24 @@ def login(request):
         else:
             warnings.warn("Email ou senha inválidos", DeprecationWarning)
         return {'form': form.render()}
+    #não entra nesse elif
+	#elif 'Esqueci a senha' in request.POST:  
     elif 'Esqueci' in request.POST:  
         return HTTPFound(location=request.route_url('r_senha'))
     else:
         return {'form': form.render()}
     
-@view_config(route_name='usuario', renderer='usuario.slim')
+@view_config(route_name='usuario', renderer='usuario.slim', permission='basica')
 def usuario(request):
-
-    esquema = FormUsuario().bind(request=request)
-    esquema.title = "Página do usuário"
-    form = deform.Form(esquema)
-    if 'Usuario' in request.POST:
-
-        try:
-            form.validate(request.POST.items())
-        except deform.ValidationFailure as e:
-            return {'form': e.render()}
-
-        return HTTPFound(location=request.route_url('lista'))
-    else:
-        return {'form': form.render()}
+    cidadao = Cidadao("","")
+    cidadao = request.db["usrTree"][authenticated_userid(request)]	
+    return {
+        'cidadao': cidadao
+    }
 
 @view_config(route_name='sobre', renderer='sobre.slim')
 def sobre(request):
-
-    esquema = FormSobre().bind(request=request)
-    esquema.title = "Sobre o Cuidando"
-    form = deform.Form(esquema)
-    if 'Sobre' in request.POST:
-
-        try:
-            form.validate(request.POST.items())
-        except deform.ValidationFailure as e:
-            return {'form': e.render()}
-
-        return HTTPFound(location=request.route_url('lista'))
-    else:
-        return {'form': form.render()}
+    return {}
 
 @view_config(route_name='mapa', renderer='mapa.slim')
 def mapa(request):
@@ -274,42 +272,18 @@ def inserir_ponto(request):
             request.db['atvTree'][atividade.atividade] = atividade
             transaction.commit()
             request.session.flash(u"Atividade de usuário cadastrada com sucesso.")
-			
+		#teste	
         return HTTPFound(location=request.route_url('lista'))
     else:
         return {'form': form.render()}
 
 @view_config(route_name='privacidade', renderer='privacidade.slim')
 def privacidade(request):
-
-    esquema = FormInserirP().bind(request=request)
-    esquema.title = "Inserir ponto no mapa"
-    form = deform.Form(esquema)
-    if 'privacidade' in request.POST:
-        try:
-            form.validate(request.POST.items())
-        except deform.ValidationFailure as e:
-            return {'form': e.render()}
-
-        return HTTPFound(location=request.route_url('lista'))
-    else:
-        return {'form': form.render()}
+    return {}
 		
 @view_config(route_name='termos', renderer='termos.slim')		
 def termos(request):
-
-    esquema = FormInserirP().bind(request=request)
-    esquema.title = "Inserir ponto no mapa"
-    form = deform.Form(esquema)
-    if 'privacidade' in request.POST:
-        try:
-            form.validate(request.POST.items())
-        except deform.ValidationFailure as e:
-            return {'form': e.render()}
-
-        return HTTPFound(location=request.route_url('lista'))
-    else:
-        return {'form': form.render()}
+    return {}
 
 @view_config(
     route_name='rcad_senha',

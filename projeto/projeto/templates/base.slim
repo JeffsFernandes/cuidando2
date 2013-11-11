@@ -41,14 +41,14 @@ html
             li
               a href="${request.route_url('login')}" Login	
             /parou de funcionar... vai saber.....			  
-            -if hasattr(request, 'cidadao')			
+            -if hasattr(request.session, "auth")
               li			  
                 a href="${request.route_url('usuario')}" Usuário		
               li
                 a href="${request.route_url('configuracao')}" Configurar
               li
                 a href="${request.route_url('logout')}" Sair	
-            -if not hasattr(request, 'cidadao')	
+            -if not hasattr(request.session, "auth")		
               li
                 a href="${request.route_url('cadastro')}" Cadastrar				
             li

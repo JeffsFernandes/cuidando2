@@ -1,5 +1,19 @@
--inherit base.slim
+﻿-inherit base.slim
 
 -block conteudo
-  -if form
-    =form|n
+  h3 Informações do perfil
+  p =cidadao.foto 
+  p =cidadao.nome
+  /calculo
+  p =cidadao.nascimento 
+  p =cidadao.genero    
+  p =cidadao.informacoes
+  
+  h3 Atividades recentes
+  
+  h3 Notificações
+  
+  h3 Respostas
+  
+  h3 Estatísticas
+
