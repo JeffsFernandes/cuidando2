@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import deform
 from deform import widget
+from deform.interfaces import FileUploadTempStore 
 from pyramid_deform import CSRFSchema
 import colander
 from colander import (
@@ -26,10 +27,16 @@ from colander import (
 from .models import Cidadao
 
 def record_to_appstruct(self):
+    """
+	Insere os valores vindos do formulário para o banco 
+	"""
     return dict([(k, self.__dict__[k]) for k in sorted(self.__dict__)
                  if '_sa_' != k[:4]])
 
 def merge_session_with_post(session, post):
+    """
+	Insere os valores vindos do objeto do banco para o formulário
+	"""
     for key, value in post:
         setattr(session, key, value)
     return session
@@ -85,14 +92,37 @@ tipoNot = (
     ('ponto', 'Atualizações de pontos próximos ao endereço cadastrado'),
     ('evento', 'Eventos próximos ao endereço cadastrado'))
 
+#Define a lista de anos mapeados (seria interessante se fosse dinâmica de alguma forma..)
+anoMapa = (
+    ('2013', '2013'),
+    ('2012', '2012'),
+    ('2011', '2011'),
+    ('2010', '2010'),
+    ('2009', '2009'),
+    ('2008', '2008'),
+)	
+
 @colander.deferred
 def deferred_verif_email_unico(node, kw):
+    """
+	Verifica se o email inserido para cadastro já existe no banco
+	"""
     request = kw.get('request')
     emails = request.db["usrTree"].keys()
     return All(
         Email('E-mail inválido'),
         Function(lambda x: not (x in emails), u"Email já cadastrado")
     )
+
+class MemoryTmpStore(dict):
+    """ Instances of this class implement the
+    :class:`deform.interfaces.FileUploadTempStore` interface
+    """
+    def preview_url(self, uid):
+        return None
+
+tmpstore = MemoryTmpStore()
+#tmpstore = FileUploadTempStore()
 
 class FormCadastrar(CSRFSchema):
     nome = SchemaNode(
@@ -129,7 +159,10 @@ class FormCadastrar(CSRFSchema):
     )			
 
 class FormConfigurar(CSRFSchema):
-
+    """
+    Formulário para configuração de perfil do usuário
+    """
+    
     nome = SchemaNode(
         String(),
         validator=All(
@@ -162,12 +195,11 @@ class FormConfigurar(CSRFSchema):
     )        
 
     foto = SchemaNode(
-        String(),
-	    #FileData(),
-        #widget=.widget.FileUploadWidget(tmpstore, item_css_class='mapped_widget_custom_class')		
+        deform.FileData(),
+        widget=widget.FileUploadWidget(tmpstore),
         missing=unicode(''),		
-        description='Carregar foto'	
-    )   
+        description='Carregar foto'
+    ) 
 		
     rua = SchemaNode(
         String(),
@@ -256,7 +288,28 @@ class FormMapa(CSRFSchema):
         widget=widget.TextAreaWidget(rows=10, cols=60, css_class='form-control')
     )
 
+class FormPesqMapa(CSRFSchema):
+    """
+    Formulário de pesquisa no mapa
+    """	
+    ano = SchemaNode(
+        String(),
+        missing=unicode(''),
+        widget=widget.SelectWidget(values=anoMapa),
+        title = "Ano",		
+    )
+    endereco = SchemaNode(
+        String(),
+        missing=unicode(''),		
+        title='Ir para endereço',
+        validator=Length(max=100),
+        widget=widget.TextAreaWidget(rows=1, cols=60)
+    )
+	
 class FormOrcamento(CSRFSchema):
+    """
+    Formulário para inserção de comentários no orçamento
+    """
     comentario = SchemaNode(
         String(),
         missing=unicode(''),		
@@ -265,6 +318,28 @@ class FormOrcamento(CSRFSchema):
         validator=Length(max=100),
         widget=widget.TextAreaWidget(rows=10, cols=60)
     )	
+	
+class FormOrcFoto(CSRFSchema):
+    """
+    Formulário para upload de fotos para o orçamento
+    """
+
+    foto = SchemaNode(
+        deform.FileData(),
+        widget=widget.FileUploadWidget(tmpstore),
+        missing=unicode(''),		
+        description='Carregar foto'
+    )  	
+
+class FormOrcVideo(CSRFSchema):
+    """
+    Formulário para upload de vídeos para o orçamento
+    """
+    video = SchemaNode(
+        String(),
+        missing=unicode(''),		
+        description='Carregar url de vídeo'
+    )    	
 	
 class FormLogin(CSRFSchema):
     email = SchemaNode(
@@ -303,18 +378,15 @@ class FormInserirP(CSRFSchema):
         title = "Gênero",		
     )
     foto = SchemaNode(
-        String(),
-	    #FileData(),
-        #widget=widget.FileUploadWidget(tmpstore),
+        deform.FileData(),
+        widget=widget.FileUploadWidget(tmpstore),
         missing=unicode(''),		
         description='Carregar foto'
     )  
     video = SchemaNode(
         String(),
-	    #FileData(),
-        #widget=widget.FileUploadWidget(tmpstore),
         missing=unicode(''),		
-        description='Carregar vídeo'
+        description='Carregar url de vídeo'
     )    	
     descricao = SchemaNode(
         String(),

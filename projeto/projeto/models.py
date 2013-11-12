@@ -4,6 +4,8 @@
 from persistent.mapping import PersistentMapping
 from persistent import Persistent
 from BTrees.OOBTree import OOBTree
+from deform.interfaces import FileUploadTempStore 
+from ZODB.blob import Blob
 
 import transaction
 from pyramid.security import (
@@ -34,7 +36,9 @@ class UsrTree(OOBTree):
     __usr__ = __name__ = "usrTree"	
 
 class Cidadao(PersistentMapping):
-
+    """
+    Classe de cidadãos (usuários) cadastrados
+    """	
     def __init__(
         self,
         nome,
@@ -48,14 +52,15 @@ class Cidadao(PersistentMapping):
         bairro="",
         cidade="",
         estado="",
-        foto="",
+		#como guardar a imagem?
+        foto=Blob(),
         informacoes="",
         login_twitter="",
         login_facebook="",
         notificacoes_site="",
         notificacoes_email="",
         atualizacoes_pontos="",
-        atualizacoes_eventos="",	
+        atualizacoes_eventos="",
     ):
 
         self.nome = nome

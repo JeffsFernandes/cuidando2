@@ -10,12 +10,13 @@ from .models import RootFactory
 from pyramid_beaker import session_factory_from_settings
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
-
+import pydoc
 from security import groupfinder
 
 
 def main(global_config, **settings):
-    """ This function returns a Pyramid WSGI application.
+    """ 
+	Esta função retorna uma aplicação WSGI Pyramid
     """
     session_factory = session_factory_from_settings(settings)  
 
@@ -25,6 +26,7 @@ def main(global_config, **settings):
         session_factory=session_factory,
     )
 
+	#configuração de autenticação para sessões
     authn_policy = AuthTktAuthenticationPolicy(
         secret='2398ry289$#T$#Tnykki4jh3t4t34239ryh9',
         callback=groupfinder,
@@ -55,6 +57,7 @@ def main(global_config, **settings):
     config.add_static_view('deform_static', 'deform:static')
     config.add_static_view('deform_bootstrap', 'deform_bootstrap:static')
 
+	#camminho das páginas
     config.add_route('inicial', '/')
     config.add_route('lista', '/listar')
     config.add_route('cadastro', '/cadastrar')

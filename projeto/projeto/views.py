@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 
 from pyramid.view import view_config
-from .models import Cidadao, Atividade_cidadao
+from .models import Cidadao, Atividade_cidadao, Atividade_orcamento
 #from .models import Cidadao, UsrTree, Atividade_cidadao
 #from .models import Cidadao, MyModel, UsrTree
 #por que MyModel?
 from beaker.middleware import SessionMiddleware
 from datetime import datetime
 import warnings
+import itertools
 
 from pyramid.httpexceptions import (
     HTTPFound,
@@ -32,6 +33,9 @@ from forms import (
     FormOrcamento,
     FormRecadSenha,	
     FormRSenha,
+    FormPesqMapa,
+    FormOrcFoto,
+    FormOrcVideo,
 )
 import deform
 import transaction
@@ -203,6 +207,9 @@ def login(request):
     
 @view_config(route_name='usuario', renderer='usuario.slim', permission='basica')
 def usuario(request):
+    """
+	Página do perfil do usuário
+	"""
     cidadao = Cidadao("","")
     cidadao = request.db["usrTree"][authenticated_userid(request)]	
     return {
@@ -215,35 +222,70 @@ def sobre(request):
 
 @view_config(route_name='mapa', renderer='mapa.slim')
 def mapa(request):
-
+    """
+    Página dos orçamentos mapeados
+    """
+    esquemaPesq = FormPesqMapa().bind(request=request)
+    esquemaPesq.title = "Pesquisa"
+    formPesq = deform.Form(esquemaPesq, buttons=('Pesquisar',))	
+    
     esquema = FormMapa().bind(request=request)
-    esquema.title = "Mapa de orçamentos"
-    form = deform.Form(esquema, buttons=('Inserir ponto',))
-    if 'Mapa' in request.POST:
+    esquema.title = "Mapa"
+	#legenda do botão - inserir ponto
+    form = deform.Form(esquema, buttons=('Inserir',))
+
+	
+    if 'Pesquisar' in request.POST:
         try:
-            form.validate(request.POST.items())
+            formPesq.validate(request.POST.items())
         except deform.ValidationFailure as e:
             return {'form': e.render()}
 
         return HTTPFound(location=request.route_url('lista'))
+    elif 'Inserir' in request.POST:
+        return HTTPFound(location=request.route_url('inserir_ponto'))	
     else:
-        return {'form': form.render()} 		
+
+        # values passed to template for rendering
+        return {
+            'form':form.render(),
+            'formPesq':formPesq.render(),
+            'showmenu':True,
+            }
 
 @view_config(route_name='orcamento', renderer='orcamento.slim')
 def orcamento(request):
+    """
+    Página de um orçamento individual
+    """
+    esquemaFoto = FormOrcFoto().bind(request=request)
+    esquemaFoto.title = "Foto"
+    formFoto = deform.Form(esquemaFoto, buttons=('Upload',))	
 
+    esquemaVideo = FormOrcVideo().bind(request=request)
+    esquemaVideo.title = "Video"
+    formVideo = deform.Form(esquemaVideo, buttons=('Upload',))		
+	
     esquema = FormOrcamento().bind(request=request)
-    esquema.title = "Detalhes do orçamento"
+    esquema.title = "Comentários"
     form = deform.Form(esquema, buttons=('Enviar',))
+	
+    atv_orc = Atividade_orcamento("","")
+	#atividade vinda do mapa
+    #atv_orc = request.db["orctree"][authenticated_userid(request)]	
+	
     if 'Orcamento' in request.POST:
         try:
             form.validate(request.POST.items())
         except deform.ValidationFailure as e:
             return {'form': e.render()}
 
-        return HTTPFound(location=request.route_url('lista'))
     else:
-        return {'form': form.render()}
+        return {
+            'form': form.render(),
+            'formVideo': formVideo.render(),
+            'formFoto': formFoto.render(),
+        }
 	
 @view_config(route_name='inserir_ponto', renderer='inserir_ponto.slim')
 def inserir_ponto(request):

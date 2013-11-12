@@ -1,5 +1,18 @@
+/* template da página de login */
+
 -inherit base.slim
 
 -block conteudo
   -if form
     =form|n
+
+  h4 Ou conecte-se com:
+  /href="${request.route_url('')}" conexão com redes
+  p
+    a href="" Facebook
+  p
+    a href="" Twitter
+	
+  h4 Não é cadastrado?
+  p
+    a href="${request.route_url('cadastro')}" Cadastre-se
