@@ -1,5 +1,17 @@
+﻿/* Template para os dados do mapa */
 -inherit base.slim
 
 -block conteudo
+  /Forulário de pesquisa no mapa
+  -if formPesq
+    =formPesq|n  
+	
+  /exibição do mapa com link para inserir ponto
   -if form
     =form|n
+	
+  h3 Gráficos
+  
+  h3 Tabelas
+
+

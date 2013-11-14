@@ -1,8 +1,16 @@
 -inherit base.slim
 
 -block conteudo
+
   h1 Usuários
   -for cidadao in cidadaos
     h4 =cidadao.nome
     p =cidadao.email
     p =cidadao.cidade
+
+  h1 Atividades usuário
+  -for atividade in atividades
+    h4 =atividade.atividade
+    p =atividade.descricao
+    p =atividade.data
+    p =atividade.cidadao

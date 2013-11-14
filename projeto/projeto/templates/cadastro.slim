@@ -1,7 +1,9 @@
+/*Template do cadastro de usuário*/
 -inherit base.slim
 
 -block conteudo
-  h1 Cuidando do meu bairro
-  h2 São Paulo
   -if form
     =form|n
+  p
+    Após o cadastro, complete seu perfil e escolha as opções do site no menu 
+	a href="${request.route_url('configuracao')}" Configuração

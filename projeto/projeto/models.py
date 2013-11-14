@@ -4,6 +4,8 @@
 from persistent.mapping import PersistentMapping
 from persistent import Persistent
 from BTrees.OOBTree import OOBTree
+from deform.interfaces import FileUploadTempStore 
+from ZODB.blob import Blob
 
 import transaction
 from pyramid.security import (
@@ -34,7 +36,9 @@ class UsrTree(OOBTree):
     __usr__ = __name__ = "usrTree"	
 
 class Cidadao(PersistentMapping):
-
+    """
+    Classe de cidadãos (usuários) cadastrados
+    """	
     def __init__(
         self,
         nome,
@@ -48,14 +52,15 @@ class Cidadao(PersistentMapping):
         bairro="",
         cidade="",
         estado="",
-        foto="",
+		#como guardar a imagem?
+        foto=Blob(),
         informacoes="",
         login_twitter="",
         login_facebook="",
         notificacoes_site="",
         notificacoes_email="",
         atualizacoes_pontos="",
-        atualizacoes_eventos="",	
+        atualizacoes_eventos="",
     ):
 
         self.nome = nome
@@ -96,26 +101,30 @@ class Atividade(Persistent):
 
     def __init__(
         self,
-        atividade,
-        descricao,
+        atividade ="",
+        descricao ="",
 
     ):
 
         self.atividade = atividade
         self.descricao = descricao
-
+#persistent ou persistent mapping??
 class Atividade_cidadao(Persistent):
 
     def __init__(
         self,
-        cidadao,
-        atividade,
-        data,
-        tipo,
+        cidadao ="",
+		#nao lembro o que era essa atividade... sao so titulo??
+		#atividade_cidadao deveria herdar de atividade
+        atividade ="",
+        descricao ="",
+        data ="",
+        tipo ="",
 
     ):
         self.cidadao = cidadao
         self.atividade = atividade
+        self.descricao = descricao		
         self.data = data
         self.tipo = tipo
 
@@ -127,13 +136,13 @@ class Atividade_orcamento(Persistent):
 
     def __init__(
         self,
-        atividade,
-        orcado,
-        atualizado,
-        ano,
-        empenhado,
-        liquidado,
-        orgao,
+        atividade = "",
+        orcado ="",
+        atualizado = "",
+        ano="",
+        empenhado="",
+        liquidado="",
+        orgao="",
 
     ):
 
@@ -200,7 +209,7 @@ class Midia_comentario(Midia):
         self,
         comentario,
         data,
-        comentarioPai,
+        comentarioPai="",
 
     ):
 

@@ -1,8 +1,21 @@
+﻿/* Template dos dados individuais dos orçamentos */
 -inherit base.slim
 
 -block conteudo
+  h3 Descrição do orçamento
+
+  /formmulário para upload de fotos
+  -if formFoto
+    =formFoto|n
+
+  /formmulário para upload de vídeos
+  -if formVideo
+    =formVideo|n  
+
+  /formulário de inserção de comentários  
   -if form
     =form|n
-/  -md
-/    [[embed url=http://www.youtube.com/watch?v=LpGmQZ5gpHQ]] 
+	
+	/-md
+    /[[embed url=http://www.youtube.com/watch?v=LpGmQZ5gpHQ]] 
 	
