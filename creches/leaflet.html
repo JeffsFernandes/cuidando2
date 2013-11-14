@@ -9,18 +9,23 @@
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
 	<!--[if lte IE 8]><link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" /><![endif]-->
 	<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
-	
+	<script src="jquery-1.10.2.min.js"></script>
+	<script src="jquery.csv-0.71.min.js"></script>
 	<link rel="stylesheet" href="MarkerCluster.css" />
 	<link rel="stylesheet" href="MarkerCluster.Default.css" />
 	<script src="leaflet.markercluster-src.js"></script>
-	<script src="saida.js"></script>
 	<!--[if lte IE 8]><link rel="stylesheet" href="../dist/leaflet.ie.css" /><![endif]-->
 </head>
 <body>
 	<div id="map" style="width: 600px; height: 400px"></div>
 
-	<script src="../dist/leaflet.js"></script>
 	<script>
+		var arq = $.get("teste.csv");
+		var string = Object.toString(arq);
+		console.log(string.responseText);
+		var teste = $.csv.toArray(string);
+		console.log(teste);
+
 		var cities = new L.LayerGroup();
 
 	    L.marker([39.61, -105.02]).bindPopup('This is Littleton, CO.').addTo(cities),
