@@ -8,7 +8,28 @@
   h3 Mapa - 2013
   
   h3 Atualizações
-  
+  -if atualAtv
+    ul
+      -for atv in atualAtv
+        li = atv.atividade
+        /atv.descricao
   h3 Tópicos em destaque
+  -if destaqueAtv
+    ul
+      -for destaque in destaqueAtv
+        li = destaque.atividade  
   
   h3 Estatísticas
+  p Quantidade de atividades orçamentárias
+    p = qtdeAtvOrc	
+  p Quantidade de atividades inseridas pelos usuários
+    p = qtdeAtvUsr
+  p Quantidade de usuários cadastrados
+    p = qtdeUsr	
+  p Quantidade de fotos inseridas
+    p = qtdeFotos	
+  p Quantidade de vídeos inseridos
+    p = qtdeVideos	
+  p Quantidade de comentários dos usuários
+    p = qtdeComent	
+	

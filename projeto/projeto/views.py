@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pyramid.view import view_config
-from .models import Cidadao, Atividade_cidadao, Atividade_orcamento
+from .models import Cidadao, Atividade_cidadao, Atividade_orcamento, Dados_site
 #from .models import Cidadao, UsrTree, Atividade_cidadao
 #from .models import Cidadao, MyModel, UsrTree
 #por que MyModel?
@@ -10,6 +10,7 @@ from beaker.middleware import SessionMiddleware
 from datetime import datetime
 import warnings
 import itertools
+from BTrees.OOBTree import OOBTree
 
 from pyramid.httpexceptions import (
     HTTPFound,
@@ -42,7 +43,33 @@ import transaction
 
 @view_config(route_name='inicial', renderer='inicial.slim')
 def my_view(request):
-    return {'project': 'projeto'}
+    """ 
+    Página inicial: resgata os contadores estatísticos e outros dados do site
+    """
+    #del request.db["atualAtv"]
+    if not "dadosSite" in request.db:
+        request.db["dadosSite"] = Dados_site()
+		
+    atualiz_atv = request.db['dadosSite'].atualiz_atv
+    qtde_atv_orc = request.db['dadosSite'].qtde_atv_orc
+    qtde_atv_usr = request.db['dadosSite'].qtde_atv_usr
+    qtde_usr = request.db['dadosSite'].qtde_usr
+    
+    qtde_fotos = request.db['dadosSite'].qtde_fotos
+    qtde_videos = request.db['dadosSite'].qtde_videos
+    qtde_coment = request.db['dadosSite'].qtde_coment
+    destaque_atv = request.db['dadosSite'].destaque_atv
+	
+    return {
+        'atualAtv': atualiz_atv,
+        'qtdeAtvOrc': qtde_atv_orc,
+        'qtdeAtvUsr': qtde_atv_usr,
+        'qtdeUsr': qtde_usr,
+        'qtdeFotos': qtde_fotos,
+        'qtdeVideos': qtde_videos,
+        'qtdeComent': qtde_coment,
+        'destaqueAtv': destaque_atv,
+    }
 
 @view_config(
     route_name='lista',
@@ -50,6 +77,9 @@ def my_view(request):
     permission='comum'
 )
 def lista(request):
+    """ 
+    Página teste dos cadastros
+    """
     cidadaos = request.db['usrTree'].values()
     atividades = request.db['atvTree'].values()
     return {
@@ -64,7 +94,6 @@ def cadastro(request):
     # Ensure that a ’userdb’ key is present
     # in the root
     if not request.db.has_key("usrTree"):
-        from BTrees.OOBTree import OOBTree
         request.db["usrTree"] = OOBTree()
 		
     esquema = FormCadastrar().bind(request=request)
@@ -83,6 +112,11 @@ def cadastro(request):
 		#tchau lista
         #request.db['cidadaos'][cidadao.email] = cidadao
         request.db['usrTree'][cidadao.email] = cidadao
+		
+        dadosSite = request.db['dadosSite']
+        #chama função para atualizar contadores
+        Dados_site.addUsr(dadosSite)
+		
         transaction.commit()
         request.session.flash(u"Usuário registrado com sucesso.")
         request.session.flash(u"Agora você já pode logar com ele.")
@@ -171,7 +205,9 @@ def logout(request):
 
 @view_config(route_name='login', renderer='login.slim')
 def login(request):
-
+    """ 
+    Página para login, site, face e twitter
+    """
     esquema = FormLogin().bind(request=request)
     esquema.title = "Login"
 	#botoes nao aceitam frases como label = "esqueci a senha"
@@ -218,6 +254,9 @@ def usuario(request):
 
 @view_config(route_name='sobre', renderer='sobre.slim')
 def sobre(request):
+    """ 
+    Página sobre
+    """
     return {}
 
 @view_config(route_name='mapa', renderer='mapa.slim')
@@ -260,26 +299,57 @@ def orcamento(request):
     """
     esquemaFoto = FormOrcFoto().bind(request=request)
     esquemaFoto.title = "Foto"
-    formFoto = deform.Form(esquemaFoto, buttons=('Upload',))	
+    formFoto = deform.Form(esquemaFoto, buttons=('UploadF',))	
 
     esquemaVideo = FormOrcVideo().bind(request=request)
     esquemaVideo.title = "Video"
-    formVideo = deform.Form(esquemaVideo, buttons=('Upload',))		
+    formVideo = deform.Form(esquemaVideo, buttons=('UploadV',))		
 	
     esquema = FormOrcamento().bind(request=request)
     esquema.title = "Comentários"
     form = deform.Form(esquema, buttons=('Enviar',))
-	
+		
     atv_orc = Atividade_orcamento("","")
 	#atividade vinda do mapa
-    #atv_orc = request.db["orctree"][authenticated_userid(request)]	
+    #atv_orc = request.db["orcTree"]
+	#atv_orc = request.db["atvTree"]
 	
-    if 'Orcamento' in request.POST:
+    if 'UploadF' in request.POST:
+        try:
+            formFoto.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+			
+		#3 linhas abaixo se repetindo para os 3 forms.... como otimizar??
+        dadosSite = request.db['dadosSite']
+        #chama função para inserir na lista de atualizações		
+        Dados_site.addAtual(dadosSite, atv_orc) 
+        Dados_site.addFoto(dadosSite)
+
+    if 'UploadV' in request.POST:
+        try:
+            formVideo.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+			
+	    #3 linhas abaixo se repetindo para os 3 forms.... como otimizar??
+        dadosSite = request.db['dadosSite']
+        #chama função para inserir na lista de atualizações		
+        Dados_site.addAtual(dadosSite, atv_orc) 
+        Dados_site.addVideo(dadosSite)			
+			
+    if 'Enviar' in request.POST:
         try:
             form.validate(request.POST.items())
         except deform.ValidationFailure as e:
-            return {'form': e.render()}
-
+            return {'form': e.render()}	
+			
+		#3 linhas abaixo se repetindo para os 3 forms.... como otimizar??
+        dadosSite = request.db['dadosSite']
+        #chama função para inserir na lista de atualizações		
+        Dados_site.addAtual(dadosSite, atv_orc)
+        Dados_site.addComent(dadosSite)			
+			       
     else:
         return {
             'form': form.render(),
@@ -289,13 +359,14 @@ def orcamento(request):
 	
 @view_config(route_name='inserir_ponto', renderer='inserir_ponto.slim')
 def inserir_ponto(request):
-
+    """ 
+    Página para inserir novos pontos/atividades no mapa pelo usuário
+    """
     esquema = FormInserirP().bind(request=request)
     esquema.title = "Inserir ponto no mapa"
     form = deform.Form(esquema, buttons=('Inserir', 'Cancelar'))
 	
     if not request.db.has_key("atvTree"):
-        from BTrees.OOBTree import OOBTree
         request.db["atvTree"] = OOBTree()
 		
     if 'Inserir' in request.POST:
@@ -312,6 +383,11 @@ def inserir_ponto(request):
             atividade.data = datetime.now()
             atividade.cidadao = authenticated_userid(request)
             request.db['atvTree'][atividade.atividade] = atividade
+			
+            dadosSite = request.db['dadosSite']
+            #chama função para inserir na lista de atualizações		
+            Dados_site.addAtual(dadosSite, atividade)
+            Dados_site.addAtvUsr(dadosSite)
             transaction.commit()
             request.session.flash(u"Atividade de usuário cadastrada com sucesso.")
 		#teste	
@@ -321,10 +397,16 @@ def inserir_ponto(request):
 
 @view_config(route_name='privacidade', renderer='privacidade.slim')
 def privacidade(request):
+    """ 
+    Página com a política de privacidade do site
+    """
     return {}
 		
 @view_config(route_name='termos', renderer='termos.slim')		
 def termos(request):
+    """ 
+    Página com os termos e condições de uso do site
+    """
     return {}
 
 @view_config(
@@ -359,8 +441,10 @@ def rcad_senha(request):
     permission='comum'
 )
 def r_senha(request):
-    """Reenviar senha de usuário"""
-
+    """ 
+    Reconfiguração de senha do usuário
+    Envia token para email do usuário
+    """
     esquema = FormRSenha().bind(request=request)
     esquema.title = "Reenviar senha"
     

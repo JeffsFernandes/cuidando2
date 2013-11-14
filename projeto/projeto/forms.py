@@ -115,7 +115,9 @@ def deferred_verif_email_unico(node, kw):
     )
 
 class MemoryTmpStore(dict):
-    """ Instances of this class implement the
+    """ 
+    Para upload da imagem
+    Instances of this class implement the
     :class:`deform.interfaces.FileUploadTempStore` interface
     """
     def preview_url(self, uid):
@@ -125,6 +127,10 @@ tmpstore = MemoryTmpStore()
 #tmpstore = FileUploadTempStore()
 
 class FormCadastrar(CSRFSchema):
+    """ 
+    Formulário para cadastro de novo usuário
+    falta acesso para termos e condições de uso
+    """
     nome = SchemaNode(
         String(),
         validator=All(
@@ -248,6 +254,9 @@ class FormConfigurar(CSRFSchema):
         title='Tipos de notificações')	
 	
 class FormContato(CSRFSchema):
+    """ 
+    Formulário para contato com equipe do site
+    """
     nome = SchemaNode(
         String(),
         validator=All(
@@ -279,6 +288,9 @@ class FormContato(CSRFSchema):
     )								
 	
 class FormMapa(CSRFSchema):
+    """ 
+    Formulário para o mapa (se necessário)
+    """
     mensagem = SchemaNode(
         String(),
         missing=unicode(''),		
@@ -342,6 +354,9 @@ class FormOrcVideo(CSRFSchema):
     )    	
 	
 class FormLogin(CSRFSchema):
+    """ 
+    Formulário para login
+    """
     email = SchemaNode(
         String(),
         validator=Email('E-mail inválido'),
@@ -355,6 +370,9 @@ class FormLogin(CSRFSchema):
     )
 
 class FormInserirP(CSRFSchema):
+    """ 
+    Formulário para inserção de novo ponto/atividade no mapa
+    """
     atividade = SchemaNode(
         String(),
         validator=All(
@@ -398,7 +416,9 @@ class FormInserirP(CSRFSchema):
     )		
 
 class FormRecadSenha(CSRFSchema):
-
+    """ 
+    Formulário para cadastrar uma nova senha, só será possível se o token estiver correto
+    """
     token = SchemaNode(
         String(),
         missing=unicode(''),		
@@ -414,7 +434,9 @@ class FormRecadSenha(CSRFSchema):
     )	
 	
 class FormRSenha(CSRFSchema):
-
+    """ 
+    Formulário para enviar token de senha para o usuário, de acordo com o email inserido
+    """
     email = SchemaNode(
         String(),
         validator=Email('E-mail inválido'),

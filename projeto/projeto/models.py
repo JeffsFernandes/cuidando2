@@ -16,6 +16,10 @@ from pyramid.security import (
 from pyramid_zodbconn import get_connection
 
 class RootFactory(object):
+    """
+    Inicia conexão do banco
+    Grupos de permissões para acesso ao banco 
+    """	
     __acl__ = [
         (Allow, 'g:admin', ALL_PERMISSIONS),
         (Allow, 'g:cidadao', 'basica'),
@@ -29,6 +33,7 @@ class RootFactory(object):
         #return None
         #return conn.root()
 
+#ainda não entendi o que é esse myModel		
 class MyModel(PersistentMapping):
     __parent__ = __name__ = None
 
@@ -53,7 +58,7 @@ class Cidadao(PersistentMapping):
         cidade="",
         estado="",
 		#como guardar a imagem?
-        foto=Blob(),
+        foto="",#Blob(),
         informacoes="",
         login_twitter="",
         login_facebook="",
@@ -89,7 +94,9 @@ class Cidadao(PersistentMapping):
         self.denuncias = []		
 
 class Notificacao(Persistent):
-
+    """
+    Classe para armazenar as atividades a serem notificadas para o usuário quando há atualizações
+    """	
     def __init__(
         self,
         atividade,        
@@ -98,7 +105,9 @@ class Notificacao(Persistent):
         self.atividade = atividade
 
 class Atividade(Persistent):
-
+    """
+    Classe mãe das atividades orçamentárias e atividades inseridas pelos usuários
+    """	
     def __init__(
         self,
         atividade ="",
@@ -109,8 +118,12 @@ class Atividade(Persistent):
         self.atividade = atividade
         self.descricao = descricao
 #persistent ou persistent mapping??
-class Atividade_cidadao(Persistent):
 
+class Atividade_cidadao(Persistent):
+    """
+    Deve herdar de Atividade
+    Classe atividades inseridas pelos usuários
+    """	
     def __init__(
         self,
         cidadao ="",
@@ -133,7 +146,10 @@ class Atividade_cidadao(Persistent):
         self.midia_coment = []			
 
 class Atividade_orcamento(Persistent):
-
+    """
+    Deve herdar de Atividade
+    Classe atividades orçamentárias vindas do cuidando 1.0
+    """	
     def __init__(
         self,
         atividade = "",
@@ -159,7 +175,9 @@ class Atividade_orcamento(Persistent):
         self.midia_coment = []		
 
 class Midia(Persistent):
-
+    """
+    Classe mãe dos tipos de mídias que serão associados às atividades
+    """	
     def __init__(
         self,
         atividade,
@@ -175,7 +193,10 @@ class Midia(Persistent):
         self.denuncias = []		
 
 class Midia_foto(Midia):
-
+    """
+    Herda de Mídia
+    Classe que receberá as imagens
+    """	
     def __init__(
         self,
         imagem,
@@ -189,7 +210,10 @@ class Midia_foto(Midia):
         self.denuncias = []			
 
 class Midia_video(Midia):
-
+    """
+    Herda de Mídia
+    Classe que receberá os links para os vídeos
+    """	
     def __init__(
         self,
         link,
@@ -204,7 +228,10 @@ class Midia_video(Midia):
 
 #comentamos sobre lista de comentarios....
 class Midia_comentario(Midia):
-
+    """
+    Herda de Mídia
+    Classe que receberá os comentários
+    """	
     def __init__(
         self,
         comentario,
@@ -221,9 +248,11 @@ class Midia_comentario(Midia):
 	
 #ira se transformar em uma hash
 #deixa ai por enquanto	
-#droga de arquivo que nao aceita pontuacoes.....
-class Denuncia(Persistent):
 
+class Denuncia(Persistent):
+    """
+    Classe que irá armazenar as denúncias relacionadas ás mídias inseridas
+    """	
     def __init__(
         self,
         midia,
@@ -238,13 +267,97 @@ class Denuncia(Persistent):
         self.video = []       
         self.foto = [] 	
         self.coment = [] 		
+
+class Dados_site(PersistentMapping):
+    """
+    Objeto único no bd para inserir os dados estatísticos do site
+    """
+    def __init__(
+        self,
+        atualiz_atv = [],
+        destaque_atv = [],		
+        qtde_usr = 0,
+        qtde_atv_orc = 0,
+        qtde_atv_usr = 0,
+        qtde_fotos = 0,
+        qtde_videos = 0,
+        qtde_coment = 0,
+    ):
+        self.atualiz_atv = atualiz_atv
+        self.destaque_atv = destaque_atv
+        self.qtde_usr = qtde_usr
+        self.qtde_atv_orc = qtde_atv_orc
+        self.qtde_atv_usr = qtde_atv_usr
+        self.qtde_fotos = qtde_fotos
+        self.qtde_videos = qtde_videos
+        self.qtde_coment = qtde_coment
+
+    def addAtual(self, atualiz_atv):
+		#insere só 5 novas atualizações, se lista copleta, deleta o mais antigo
+        if(	len(self.atualiz_atv) > 5):	
+            del self[0]	
+        self.atualiz_atv.append(atualiz_atv)
+        self._p_changed = 1
+		
+    def addAtvUsr(self):
+		#adiciona contador de atividades inseridas pelo usuario
+        #não tem uma forma mais bonita de adicionar 1?...
+        self.qtde_atv_usr = self.qtde_atv_usr +1
+
+    def addAtvOrc(self):
+		#adiciona contador de atividades de orçamento
+		#provavelmente só chamada da importação dos dados do 1.0
+        self.qtde_atv_orc = self.qtde_atv_orc +1
+		
+    def addUsr(self):
+		#adiciona contador de usuário cadastrados
+        self.qtde_usr = self.qtde_usr +1
+		
+    def addFoto(self):
+		#adiciona contador de usuário cadastrados
+        self.qtde_fotos = self.qtde_fotos +1
+		
+    def addVideo(self):
+		#adiciona contador de usuário cadastrados
+        self.qtde_videos = self.qtde_videos +1
+		
+    def addComent(self):
+		#adiciona contador de usuário cadastrados
+        self.qtde_coment = self.qtde_coment +1
+		
+class Atualizacao_Usr(PersistentMapping):
+
+    def __init__(
+        self,
+        usuario = []
+    ):
+        self.usuario = usuario
+
+    def addAtual(self, usuario):
+        self.usuario.append(usuario)
+        self._p_changed = 1		
 		
 def appmaker(zodb_root):
+    """
+    Quando é rodado??
+    """
+	
     alterado = False
     if not 'usrTree' in zodb_root:
-        zodb_root['usrTree'] = PersistentMapping()
+		#teste
+        #zodb_root['usrTree'] = PersistentMapping()
+        zodb_root['usrTree'] = OOBTree()
         alterado = True
 
+    if not "atualUsr" in zodb_root:
+        zodb_root["atualUsr"] = PersistentMapping()		
+        alterado = True
+		
+    if not "dadosSite" in zodb_root:
+        print("criou md")
+        zodb_root["dadosSite"] = Dados_site()
+        alterado = True
+		
     if alterado:
         transaction.commit()
 
