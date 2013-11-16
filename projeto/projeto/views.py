@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pyramid.view import view_config
-from .models import Cidadao, Atividade_cidadao, Atividade_orcamento, Dados_site
+from .models import Cidadao, Atividade_cidadao, Atividade_orcamento, Dados_site, Midia_comentario
 #from .models import Cidadao, UsrTree, Atividade_cidadao
 #from .models import Cidadao, MyModel, UsrTree
 #por que MyModel?
@@ -37,6 +37,7 @@ from forms import (
     FormPesqMapa,
     FormOrcFoto,
     FormOrcVideo,
+    FormSeguirAtv,
 )
 import deform
 import transaction
@@ -133,12 +134,14 @@ def cadastro(request):
 def configuracao(request):
     """Configuração de usuário"""
 
-    esquema = FormConfigurar().bind(request=request)
-    esquema.title = "Configuração de usuário"
     cidadao = Cidadao("","")
     cidadao = request.db["usrTree"][authenticated_userid(request)]	
-
+	#verificar se cidadão está preenchido
+	
+    esquema = FormConfigurar().bind(request=request)
+    esquema.title = "Configuração de usuário"	
     form = deform.Form(esquema, buttons=('Salvar', 'Excluir'))
+
     if 'Salvar' in request.POST:
         # Validação do formulário
         try:
@@ -304,16 +307,25 @@ def orcamento(request):
     esquemaVideo = FormOrcVideo().bind(request=request)
     esquemaVideo.title = "Video"
     formVideo = deform.Form(esquemaVideo, buttons=('UploadV',))		
-	
+
     esquema = FormOrcamento().bind(request=request)
     esquema.title = "Comentários"
-    form = deform.Form(esquema, buttons=('Enviar',))
+    form = deform.Form(esquema, buttons=('Enviar',))	
+	
+    esquemaSeguir = FormSeguirAtv().bind(request=request)
+    esquemaSeguir.title = "Seguir atualizações"
+    formSeguir = deform.Form(esquemaSeguir, buttons=('Salvar',))
 		
-    atv_orc = Atividade_orcamento("","")
+    #atv_orc = Atividade_orcamento("","")
+    atv_orc = Atividade_cidadao("","")
+    atv_orc = request.db["atvTree"]["TesteC"]		
 	#atividade vinda do mapa
     #atv_orc = request.db["orcTree"]
 	#atv_orc = request.db["atvTree"]
-	
+
+    cidadao = Cidadao("","")
+    cidadao = request.db["usrTree"][authenticated_userid(request)]		
+    """		
     if 'UploadF' in request.POST:
         try:
             formFoto.validate(request.POST.items())
@@ -325,36 +337,75 @@ def orcamento(request):
         #chama função para inserir na lista de atualizações		
         Dados_site.addAtual(dadosSite, atv_orc) 
         Dados_site.addFoto(dadosSite)
-
-    if 'UploadV' in request.POST:
+        transaction.commit() 		
+        return HTTPFound(location=request.route_url('orcamento'))	
+    elif 'UploadV' in request.POST:
         try:
             formVideo.validate(request.POST.items())
         except deform.ValidationFailure as e:
             return {'form': e.render()}
-			
+		
+		#colocar dentro de try catch		
 	    #3 linhas abaixo se repetindo para os 3 forms.... como otimizar??
         dadosSite = request.db['dadosSite']
         #chama função para inserir na lista de atualizações		
         Dados_site.addAtual(dadosSite, atv_orc) 
         Dados_site.addVideo(dadosSite)			
-			
+        transaction.commit()  		
+        return HTTPFound(location=request.route_url('orcamento'))	
+    """		
     if 'Enviar' in request.POST:
         try:
+            print "ok7"			
             form.validate(request.POST.items())
         except deform.ValidationFailure as e:
-            return {'form': e.render()}	
-			
+            print "ok8"			
+            return {'form': e.render()}				
 		#3 linhas abaixo se repetindo para os 3 forms.... como otimizar??
+        print "ok2"		
         dadosSite = request.db['dadosSite']
         #chama função para inserir na lista de atualizações		
         Dados_site.addAtual(dadosSite, atv_orc)
-        Dados_site.addComent(dadosSite)			
-			       
+        Dados_site.addComent(dadosSite)	
+
+        coment = Midia_comentario("", "")
+        print "ok1"		
+        coment.comentario = request.POST.get('comentario')
+        coment.data = datetime.now()	
+        coment.cidadao = authenticated_userid(request)		
+		#verificar como vai ficar com a atividade orçamentária
+        Atividade_cidadao.addComent(atv_orc, request.POST.get(coment))	
+        transaction.commit()	
+        return HTTPFound(location=request.route_url('orcamento'))			
+    elif 'Salvar' in request.POST:
+        try:
+            formSeguir.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}	
+						
+        Cidadao.addSeguir(cidadao, atv_orc, request.POST.get('seguir'))	
+        transaction.commit()
+
+        return HTTPFound(location=request.route_url('orcamento'))		
     else:
+	
+        seguirAtv = cidadao.pontos_a_seguir	
+        print "ok2"		
+        #verifica se o usuário logado está seguindo a atividade    	    
+        if atv_orc.atividade in seguirAtv:
+            appstruct = {'seguir':True,}  
+        else:
+            appstruct = {'seguir':False,} 
+		
+			
+        appstructOrc = record_to_appstruct(atv_orc)
+        print "ok3"	
         return {
-            'form': form.render(),
+            'orcamento':atv_orc,		
+            'form': form.render(appstruct=appstructOrc),
             'formVideo': formVideo.render(),
             'formFoto': formFoto.render(),
+            'formSeguir': formSeguir.render(appstruct=appstruct),			
         }
 	
 @view_config(route_name='inserir_ponto', renderer='inserir_ponto.slim')

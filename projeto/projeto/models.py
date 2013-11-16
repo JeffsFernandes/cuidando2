@@ -7,6 +7,7 @@ from BTrees.OOBTree import OOBTree
 from deform.interfaces import FileUploadTempStore 
 from ZODB.blob import Blob
 
+
 import transaction
 from pyramid.security import (
     Allow,
@@ -62,10 +63,10 @@ class Cidadao(PersistentMapping):
         informacoes="",
         login_twitter="",
         login_facebook="",
-        notificacoes_site="",
-        notificacoes_email="",
-        atualizacoes_pontos="",
-        atualizacoes_eventos="",
+        notificacoes_site= False,
+        notificacoes_email= False,
+        atualizacoes_pontos= False,
+        atualizacoes_eventos= False,
     ):
 
         self.nome = nome
@@ -91,7 +92,28 @@ class Cidadao(PersistentMapping):
         	
         self.pontos_inseridos = []		
         self.pontos_a_seguir = []
-        self.denuncias = []		
+		#denúncias de outros usuários para este
+        self.denuncias = []	
+		
+    def addSeguir(self, Atividade, inserir):
+		#atividade que o usuário quer seguir
+		#aqui é verificado se o usuário está seguindo a atividade senão não adiciona
+
+        i = 0
+        if inserir:
+		    #segundo if necessário para não adicionar novamente a mesma atividade na lista
+            if Atividade.atividade not in self.pontos_a_seguir:	
+                self.pontos_a_seguir.append(Atividade.atividade)				
+        else:		
+            for x in self.pontos_a_seguir:
+                if Atividade.atividade == x:
+                    inserir = False			
+                    del self.pontos_a_seguir[i]			
+                i = i +1			
+			
+        self._p_changed = 1	
+
+    		
 
 class Notificacao(Persistent):
     """
@@ -143,7 +165,13 @@ class Atividade_cidadao(Persistent):
 
         self.midia_video = []	   
         self.midia_foto = []	
-        self.midia_coment = []			
+        self.midia_coment = []	
+
+    def addComent(self,Coment):
+		#comentario   
+        self.midia_coment.append(Coment)
+			
+        self._p_changed = 1			
 
 class Atividade_orcamento(Persistent):
     """
@@ -237,12 +265,14 @@ class Midia_comentario(Midia):
         comentario,
         data,
         comentarioPai="",
+        cidadao="",		
 
     ):
 
         self.comentario = comentario
         self.data = data    
-        self.comentarioPai = comentarioPai       
+        self.comentarioPai = comentarioPai  
+        self.cidadao = cidadao		
 
         self.denuncias = []	#pensando bem.. nao sei se eh necessario no comentario
 	

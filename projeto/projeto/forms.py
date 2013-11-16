@@ -21,22 +21,21 @@ from colander import (
     Invalid,
     Boolean,
     Date,
-    #FileData,
 )
 
-from .models import Cidadao
+from .models import Cidadao, Atividade_orcamento
 
 def record_to_appstruct(self):
     """
-	Insere os valores vindos do formulário para o banco 
-	"""
+    Insere os valores vindos do objeto do banco para o formulário
+    """
     return dict([(k, self.__dict__[k]) for k in sorted(self.__dict__)
                  if '_sa_' != k[:4]])
 
 def merge_session_with_post(session, post):
     """
-	Insere os valores vindos do objeto do banco para o formulário
-	"""
+    Insere os valores vindos do formulário para o banco 
+    """
     for key, value in post:
         setattr(session, key, value)
     return session
@@ -83,14 +82,6 @@ estados = (
     ('SE','Sergipe'),
     ('TO','Tocantins')
 )
-#Define a lista de meios de notificações para o usuário	
-notificacoes = (
-    ('email', 'E-mail'),
-    ('site', 'Site'))
-#Define quais tipos de notificação o usuário receberá
-tipoNot = (
-    ('ponto', 'Atualizações de pontos próximos ao endereço cadastrado'),
-    ('evento', 'Eventos próximos ao endereço cadastrado'))
 
 #Define a lista de anos mapeados (seria interessante se fosse dinâmica de alguma forma..)
 anoMapa = (
@@ -100,7 +91,7 @@ anoMapa = (
     ('2010', '2010'),
     ('2009', '2009'),
     ('2008', '2008'),
-)	
+)
 
 @colander.deferred
 def deferred_verif_email_unico(node, kw):
@@ -142,13 +133,13 @@ class FormCadastrar(CSRFSchema):
     )
     email = SchemaNode(
         String(),
-		validator=deferred_verif_email_unico,
+        validator=deferred_verif_email_unico,
         description='Digite seu e-mail',
         widget=widget.CheckedInputWidget(
             subject='Email',
             confirm_subject='Confirmar e-mail',
             size=40)
-	)	
+	)
     senha = SchemaNode(
         String(),
         validator=Length(min=5, max=32),
@@ -197,16 +188,18 @@ class FormConfigurar(CSRFSchema):
     nascimento = SchemaNode(
         Date(),
         missing=unicode(''),
-        description='Digite a data de nascimento'
+        description='Digite a data de nascimento',
+        widget= widget.DateInputWidget(mask='99/99/9999', mask_placeholder="-")
     )        
-
+    """
+    erro	
     foto = SchemaNode(
         deform.FileData(),
         widget=widget.FileUploadWidget(tmpstore),
         missing=unicode(''),		
         description='Carregar foto'
     ) 
-		
+    """		
     rua = SchemaNode(
         String(),
         missing=unicode(''),		
@@ -231,28 +224,55 @@ class FormConfigurar(CSRFSchema):
         validator=Length(max=100),
         widget=widget.TextAreaWidget(rows=10, cols=60)
     )		
-
     senha = SchemaNode(
         String(),
         missing=unicode(''),		
         validator=Length(min=5, max=32),
         widget=widget.CheckedPasswordWidget(size=20),
         description='Alterar sua senha (no mínimo 5 caracteres) e a confirme'
+    )
+
+    notificacoes_site = SchemaNode(
+        Boolean(),	
+        label='Receber notificações pelo site',
+        widget=widget.CheckboxWidget(),
+        title='Notificações',
+        missing=unicode(''),		
     )	
-    notificacoes = SchemaNode(
-        String(),
-        missing=unicode(''),
-        validator=Length(min=1),
-        widget=widget.CheckboxChoiceWidget(values=notificacoes),	
-        title='Mostrar notificações')	
-		
-    tipoNot = SchemaNode(
-        String(),
-        missing=unicode(''),
-        validator=Length(min=1),
-        widget=widget.CheckboxChoiceWidget(values=tipoNot),	
-        title='Tipos de notificações')	
-	
+    notificacoes_email = SchemaNode(
+        Boolean(),	
+        label='Receber notificações pelo email',
+        widget=widget.CheckboxWidget(),
+        title='Notificações',
+        missing=unicode(''),		
+    )	
+    atualizacoes_pontos = SchemaNode(
+        Boolean(),	
+        label='Atualizações de pontos próximos ao endereço cadastrado',
+        widget=widget.CheckboxWidget(),
+        title='Atualização',
+        missing=unicode(''),		
+    )	
+    atualizacoes_eventos = SchemaNode(
+        Boolean(),	
+        label='Eventos próximos ao endereço cadastrado',
+        widget=widget.CheckboxWidget(),
+        title='Atualização',
+        missing=unicode(''),		
+    )	
+
+class FormSeguirAtv(CSRFSchema):
+    """ 
+    Formulário para seguir atividade orçamentária/usuário
+    """	
+    seguir = SchemaNode(
+        Boolean(),	
+        label='Receber atualizações desta atividade',
+        widget=widget.CheckboxWidget(),
+        title='Seguir',
+        missing=unicode(''),		
+    )		
+
 class FormContato(CSRFSchema):
     """ 
     Formulário para contato com equipe do site
@@ -299,7 +319,7 @@ class FormMapa(CSRFSchema):
         validator=Length(max=100),
         widget=widget.TextAreaWidget(rows=10, cols=60, css_class='form-control')
     )
-
+		
 class FormPesqMapa(CSRFSchema):
     """
     Formulário de pesquisa no mapa
@@ -328,7 +348,7 @@ class FormOrcamento(CSRFSchema):
         description='Comente sobre o orçamento',
         title='Comentário',
         validator=Length(max=100),
-        widget=widget.TextAreaWidget(rows=10, cols=60)
+        widget=widget.TextAreaWidget(rows=10, cols=60),
     )	
 	
 class FormOrcFoto(CSRFSchema):
