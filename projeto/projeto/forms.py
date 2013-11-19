@@ -186,10 +186,13 @@ class FormConfigurar(CSRFSchema):
         title = "Gênero",		
     )	
     nascimento = SchemaNode(
-        Date(),
+        String(),	
+        #máscara não funciona....
+		#Date(),
         missing=unicode(''),
         description='Digite a data de nascimento',
-        widget= widget.DateInputWidget(mask='99/99/9999', mask_placeholder="-")
+		#DateInputWidget não dá erro pelo menos..
+        widget= widget.TextInputWidget(mask='99/99/9999')
     )        
     """
     erro	
@@ -348,7 +351,7 @@ class FormOrcamento(CSRFSchema):
         description='Comente sobre o orçamento',
         title='Comentário',
         validator=Length(max=100),
-        widget=widget.TextAreaWidget(rows=10, cols=60),
+        widget=widget.TextAreaWidget(rows=3, cols=60),
     )	
 	
 class FormOrcFoto(CSRFSchema):

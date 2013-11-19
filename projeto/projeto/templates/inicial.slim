@@ -9,10 +9,10 @@
   
   h3 Atualizações
   -if atualAtv
-    ul
-      -for atv in atualAtv
-        li = atv.atividade
-        /atv.descricao
+    -for atv in atualAtv
+      a href="${request.route_url('orcamento')}" ${atv.atividade}
+      br
+
   h3 Tópicos em destaque
   -if destaqueAtv
     ul
@@ -20,16 +20,11 @@
         li = destaque.atividade  
   
   h3 Estatísticas
-  p Quantidade de atividades orçamentárias:
-    = qtdeAtvOrc	
-  p Quantidade de atividades inseridas pelos usuários:
-    = qtdeAtvUsr
-  p Quantidade de usuários cadastrados:
-    = qtdeUsr	
-  p Quantidade de fotos inseridas:
-    = qtdeFotos	
-  p Quantidade de vídeos inseridos:
-    = qtdeVideos	
-  p Quantidade de comentários dos usuários:
-    = qtdeComent	
+  p Quantidade de atividades orçamentárias: ${qtdeAtvOrc}
+  p Quantidade de atividades inseridas pelos usuários: ${qtdeAtvUsr}
+  p Quantidade de usuários cadastrados: ${qtdeUsr}
+  p Quantidade de fotos inseridas: ${qtdeFotos}
+  p Quantidade de vídeos inseridos: ${qtdeVideos}
+  p Quantidade de comentários dos usuários: ${qtdeComent}
+ 
 	

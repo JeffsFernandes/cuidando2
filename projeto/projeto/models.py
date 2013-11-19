@@ -139,9 +139,24 @@ class Atividade(Persistent):
 
         self.atividade = atividade
         self.descricao = descricao
+		
+        self.midia_video = []	   
+        self.midia_foto = []	
+        self.midia_coment = []	
+
+    def addComent(self,Coment):
+		#adiciona comentario   
+        self.midia_coment.append(Coment)
+        self._p_changed = 1		
+		
+    def addVideo(self,Video):
+		#adiciona videos   
+        self.midia_video.append(Video)
+        self._p_changed = 1			
+		
 #persistent ou persistent mapping??
 
-class Atividade_cidadao(Persistent):
+class Atividade_cidadao(Atividade):
     """
     Deve herdar de Atividade
     Classe atividades inseridas pelos usuários
@@ -163,17 +178,12 @@ class Atividade_cidadao(Persistent):
         self.data = data
         self.tipo = tipo
 
-        self.midia_video = []	   
-        self.midia_foto = []	
-        self.midia_coment = []	
+		#auxiliar para saber indice do comentário pai....
+        self.aux =0
 
-    def addComent(self,Coment):
-		#comentario   
-        self.midia_coment.append(Coment)
 			
-        self._p_changed = 1			
 
-class Atividade_orcamento(Persistent):
+class Atividade_orcamento(Atividade):
     """
     Deve herdar de Atividade
     Classe atividades orçamentárias vindas do cuidando 1.0
@@ -198,9 +208,6 @@ class Atividade_orcamento(Persistent):
         self.liquidado = liquidado    
         self.orgao = orgao
 		
-        self.midia_video = []	   
-        self.midia_foto = []	
-        self.midia_coment = []		
 
 class Midia(Persistent):
     """
@@ -208,9 +215,9 @@ class Midia(Persistent):
     """	
     def __init__(
         self,
-        atividade,
         data,
         cidadao,
+        atividade="",		
 
     ):
 
@@ -228,12 +235,10 @@ class Midia_foto(Midia):
     def __init__(
         self,
         imagem,
-        data,
 
     ):
 
-        self.imagem = imagem
-        self.data = data  
+        self.imagem = imagem 
 		
         self.denuncias = []			
 
@@ -244,13 +249,12 @@ class Midia_video(Midia):
     """	
     def __init__(
         self,
-        link,
-        data,
+        link= "",
 
     ):
 
-        self.imagem = imagem
-        self.data = data    
+        self.linkOrig = link 
+        self.link = ""		
 
         self.denuncias = []	        
 
@@ -264,16 +268,16 @@ class Midia_comentario(Midia):
         self,
         comentario,
         data,
-        comentarioPai="",
-        cidadao="",		
+        comentarioPai="",	
 
     ):
 
         self.comentario = comentario
         self.data = data    
         self.comentarioPai = comentarioPai  
-        self.cidadao = cidadao		
-
+		
+        self.respostas = []		
+		
         self.denuncias = []	#pensando bem.. nao sei se eh necessario no comentario
 	
 #ira se transformar em uma hash
@@ -304,6 +308,7 @@ class Dados_site(PersistentMapping):
     """
     def __init__(
         self,
+		# na atividade a lista não ficou no init.... qual  diferença?
         atualiz_atv = [],
         destaque_atv = [],		
         qtde_usr = 0,
@@ -322,11 +327,16 @@ class Dados_site(PersistentMapping):
         self.qtde_videos = qtde_videos
         self.qtde_coment = qtde_coment
 
+	#está inserindo o objeto todo da atividade, não sei se é melhor só guardar o nome...
+	# mas aí o interessante é redirecionar o objeto para o link a ser aberto....
     def addAtual(self, atualiz_atv):
 		#insere só 5 novas atualizações, se lista copleta, deleta o mais antigo
         if(	len(self.atualiz_atv) > 5):	
-            del self[0]	
-        self.atualiz_atv.append(atualiz_atv)
+            del self.atualiz_atv[0]	
+        for atual in self.atualiz_atv:
+            if atual.atividade == atualiz_atv.atividade:
+                return			
+        self.atualiz_atv.append(atualiz_atv)	
         self._p_changed = 1
 		
     def addAtvUsr(self):

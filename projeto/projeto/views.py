@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pyramid.view import view_config
-from .models import Cidadao, Atividade_cidadao, Atividade_orcamento, Dados_site, Midia_comentario
+from .models import Cidadao, Atividade_cidadao, Atividade_orcamento, Dados_site, Midia_comentario, Midia_video
 #from .models import Cidadao, UsrTree, Atividade_cidadao
 #from .models import Cidadao, MyModel, UsrTree
 #por que MyModel?
@@ -11,6 +11,7 @@ from datetime import datetime
 import warnings
 import itertools
 from BTrees.OOBTree import OOBTree
+import tweepy
 
 from pyramid.httpexceptions import (
     HTTPFound,
@@ -210,13 +211,59 @@ def logout(request):
 def login(request):
     """ 
     Página para login, site, face e twitter
+
+	#autorização básica
+    auth = tweepy.BasicAuthHandler(username, password)
+	
+	#autorização OAuth
+    auth = tweepy.OAuthHandler(consumer_token, consumer_secret) #token e secret da aplicação ->pegar no twitter
+	#se estiver utilizando um callback url
+    #auth = tweepy.OAuthHandler(consumer_token, consumer_secret, callback_url)
+
+	#busca o token de requisição
+    try:
+        redirect_url = auth.get_authorization_url()
+    except tweepy.TweepError:
+        print 'Error! Failed to get request token.'
+
+	#armazenar tokens na sessão - pseudo exemplo
+	#So now we can redirect the user to the URL returned to us earlier from the get_authorization_url() method.
+    session.set('request_token', (auth.request_token.key, auth.request_token.secret)
+
+    # Example using callback (web app)
+    verifier = request.GET.get('oauth_verifier')
+
+    # Example w/o callback (desktop)
+    verifier = raw_input('Verifier:')
+	
+    token = session.get('request_token')
+    session.delete('request_token')
+    auth.set_request_token(token[0], token[1])
+
+    try:
+        auth.get_access_token(verifier)
+    except tweepy.TweepError:
+        print 'Error! Failed to get access token.'	
+	
+	#guardar estes valores no banco
+    auth.access_token.key
+    auth.access_token.secret	
+	
+	#quando gardar, utilizar apenas isto para utilizar o twitter
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(key, secret)	
+	
+    twitterApi = tweepy.API(auth) 
     """
+	
     esquema = FormLogin().bind(request=request)
     esquema.title = "Login"
 	#botoes nao aceitam frases como label = "esqueci a senha"
     #form = deform.Form(esquema, buttons=('Entrar', 'Esqueci a senha'))
     form = deform.Form(esquema, buttons=('Entrar', 'Esqueci'))
-
+    if authenticated_userid(request):
+       request.session.flash(u"Usuário já está logado, caso queira entrar com usuário diferente, faça o logout.")	
+       return HTTPFound(location=request.route_url('usuario'))	   
     if 'Entrar' in request.POST:
         try:
             form.validate(request.POST.items())		
@@ -231,11 +278,12 @@ def login(request):
             if cidadao.senha == senha:
                 headers = remember(request, email)
                 next = request.route_url('usuario')
-                return HTTPFound(location=next, headers=headers)				
+                request.session.flash(u"Usuário logado")				
+                return HTTPFound(location=next, headers=headers)					
             else:
-                warnings.warn("Email ou senha inválidos", DeprecationWarning)
+                request.session.flash(u"Email ou senha inválidos")			
         else:
-            warnings.warn("Email ou senha inválidos", DeprecationWarning)
+            request.session.flash(u"Email ou senha inválidos")		
         return {'form': form.render()}
     #não entra nesse elif
 	#elif 'Esqueci a senha' in request.POST:  
@@ -299,7 +347,7 @@ def mapa(request):
 def orcamento(request):
     """
     Página de um orçamento individual
-    """
+    """	
     esquemaFoto = FormOrcFoto().bind(request=request)
     esquemaFoto.title = "Foto"
     formFoto = deform.Form(esquemaFoto, buttons=('UploadF',))	
@@ -307,25 +355,38 @@ def orcamento(request):
     esquemaVideo = FormOrcVideo().bind(request=request)
     esquemaVideo.title = "Video"
     formVideo = deform.Form(esquemaVideo, buttons=('UploadV',))		
-
-    esquema = FormOrcamento().bind(request=request)
-    esquema.title = "Comentários"
-    form = deform.Form(esquema, buttons=('Enviar',))	
 	
     esquemaSeguir = FormSeguirAtv().bind(request=request)
     esquemaSeguir.title = "Seguir atualizações"
     formSeguir = deform.Form(esquemaSeguir, buttons=('Salvar',))
-		
+	
+    esquema = FormOrcamento().bind(request=request)
+    #esquema.title = "Comentários"
+    form = deform.Form(esquema, buttons=('Enviar',))	
+	
+    esquemaResp = FormOrcamento().bind(request=request)
+    #esquema.title = "Comentários"
+    formResp = deform.Form(esquemaResp, buttons=('Responder',))	
+	
     #atv_orc = Atividade_orcamento("","")
     atv_orc = Atividade_cidadao("","")
-    atv_orc = request.db["atvTree"]["TesteC"]		
+    atv_orc = request.db["atvTree"]["TesteComent2"]		
 	#atividade vinda do mapa
     #atv_orc = request.db["orcTree"]
 	#atv_orc = request.db["atvTree"]
 
+    #esquema para colocar o id nos forms das respostas
+    # envia para o template uma lista com forms de resposta	
+    i = 0
+    formsResps = []	
+    for coment in atv_orc.midia_coment:
+        formResp = deform.Form(esquemaResp, buttons=('Responder',), formid=str(i))
+        formsResps.append(formResp.render())		
+        i = i + 1		 
+	
     cidadao = Cidadao("","")
     cidadao = request.db["usrTree"][authenticated_userid(request)]		
-    """		
+	
     if 'UploadF' in request.POST:
         try:
             formFoto.validate(request.POST.items())
@@ -351,30 +412,74 @@ def orcamento(request):
         #chama função para inserir na lista de atualizações		
         Dados_site.addAtual(dadosSite, atv_orc) 
         Dados_site.addVideo(dadosSite)			
-        transaction.commit()  		
-        return HTTPFound(location=request.route_url('orcamento'))	
-    """		
-    if 'Enviar' in request.POST:
+		
+        video = Midia_video("")
+		#bolar alguma validação de lnk?
+        video.linkOrig = request.POST.get('video')
+		
+        #colocar essas funções no model		
+        video.link = video.linkOrig.replace('.com/','.com/embed/')		
+        video.link = video.linkOrig.replace('watch?v=','embed/')				
+        video.data = datetime.now()	
+        video.cidadao = authenticated_userid(request)	
+		
+        Atividade_cidadao.addVideo(atv_orc, video)		
+        transaction.commit()				
+		
+        return HTTPFound(location=request.route_url('orcamento'))		
+    elif 'Enviar' in request.POST:
         try:
-            print "ok7"			
-            form.validate(request.POST.items())
+            print "não validando form de comentário"		
+			#não funcionaaaaa por que a validação dá errado????
+            #form.validate(request.POST.items())
         except deform.ValidationFailure as e:
-            print "ok8"			
+            print "form de comentário deu erro"			
             return {'form': e.render()}				
 		#3 linhas abaixo se repetindo para os 3 forms.... como otimizar??
-        print "ok2"		
+		
         dadosSite = request.db['dadosSite']
         #chama função para inserir na lista de atualizações		
         Dados_site.addAtual(dadosSite, atv_orc)
         Dados_site.addComent(dadosSite)	
 
         coment = Midia_comentario("", "")
-        print "ok1"		
         coment.comentario = request.POST.get('comentario')
         coment.data = datetime.now()	
-        coment.cidadao = authenticated_userid(request)		
+        coment.cidadao = authenticated_userid(request)	
+        coment.atividade = "teste"
+        transaction.commit()		
 		#verificar como vai ficar com a atividade orçamentária
-        Atividade_cidadao.addComent(atv_orc, request.POST.get(coment))	
+
+        Atividade_cidadao.addComent(atv_orc, coment)	
+        transaction.commit()	
+        return HTTPFound(location=request.route_url('orcamento'))	
+    elif 'Responder' in request.POST:
+        try:
+            print "não validando form de resposta de comentário"	
+			#não funcionaaaaa por que a validação dá errado????
+            #formResp.validate(request.POST.items())
+        except deform.ValidationFailure as e:			
+            return {'form': e.render()}			
+		#pega o id do form que enviou a resposta do comentário
+        posted_formid = int(request.POST['__formid__'])		
+        		
+		#3 linhas abaixo se repetindo para os 3 forms.... como otimizar??
+        dadosSite = request.db['dadosSite']
+        #chama função para inserir na lista de atualizações		
+        Dados_site.addAtual(dadosSite, atv_orc)
+        Dados_site.addComent(dadosSite)	
+
+		#como faço para amarrar a resposta no objeto pai?...
+        coment = Midia_comentario("", "")
+        coment.comentario = request.POST.get('comentario')
+        coment.data = datetime.now()	
+        coment.cidadao = authenticated_userid(request)
+        transaction.commit()		
+
+		#adiciona a resposta ao comentário pai, conforme o id do form de resposta
+        comentPai = atv_orc.midia_coment[posted_formid] 
+        comentPai.respostas.append(coment)		
+	
         transaction.commit()	
         return HTTPFound(location=request.route_url('orcamento'))			
     elif 'Salvar' in request.POST:
@@ -387,25 +492,25 @@ def orcamento(request):
         transaction.commit()
 
         return HTTPFound(location=request.route_url('orcamento'))		
-    else:
-	
+    else: 
         seguirAtv = cidadao.pontos_a_seguir	
-        print "ok2"		
         #verifica se o usuário logado está seguindo a atividade    	    
         if atv_orc.atividade in seguirAtv:
             appstruct = {'seguir':True,}  
         else:
             appstruct = {'seguir':False,} 
-		
-			
+			  		
         appstructOrc = record_to_appstruct(atv_orc)
-        print "ok3"	
+	
         return {
-            'orcamento':atv_orc,		
+            'orcamento': atv_orc,		
             'form': form.render(appstruct=appstructOrc),
+            'coments': atv_orc.midia_coment,
+            'formResp': formsResps,
             'formVideo': formVideo.render(),
+            'videos': atv_orc.midia_video,			
             'formFoto': formFoto.render(),
-            'formSeguir': formSeguir.render(appstruct=appstruct),			
+            'formSeguir': formSeguir.render(appstruct=appstruct),				
         }
 	
 @view_config(route_name='inserir_ponto', renderer='inserir_ponto.slim')

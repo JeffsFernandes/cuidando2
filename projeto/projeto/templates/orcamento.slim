@@ -1,4 +1,5 @@
 ﻿/* Template dos dados individuais dos orçamentos */
+ --------------------------------------------------
 -inherit base.slim
 
 -block conteudo
@@ -8,24 +9,74 @@
   p = orcamento.descricao
 
   /formmulário para upload de fotos
+   -------------------------
   -if formFoto
     =formFoto|n
 
+  /exibição dos vídeos cadastrados
+   -------------------------	
+  -python
+    i = 0
+    limit = len(videos)
+	
+  -while i < limit
+    p = videos[i].link	
+    <iframe width="420" height="315" src="${videos[i].link}" frameborder="0" allowfullscreen></iframe>
+    br 	
+	
+    -python	
+      i +=1
+	  
   /formmulário para upload de vídeos
+   ------------------------- 
   -if formVideo
     =formVideo|n  
 
-  /formulário de inserção de comentários  
-  -if form
-    =form|n  
+  -python
+    i = 0
+    limit = len(coments)
 	
+  -while i < limit
+    p = coments[i].comentario
+    -python	
+      j = 0
+      limitj = len(coments[i].respostas)
+
+    /lista na resposta só para verificar visualemnte, inserir identação e tabela para separa comentários pais de respostas
+     ------------------------------------------------------------------------------------------------------	
+    ul	 
+    /loop secundário para mostrar as respostas, colocar recursão para não limitar o nível de respostas
+     -------------------------------------------------------------------------------------------------	
+    -while j < limitj
+      li = coments[i].respostas[j].comentario
+      -py 
+        j += 1	  
+    -if formResp	
+      =formResp[i]|n	
+    -py 
+      #errado
+      #  ---------------------------------------------------------------------------------------------------- 		
+      #orcamento.aux = i	
+      i += 1
+        	  
+  /formulário de inserção de comentários 
+   -------------------------  
+  -if form
+    =form|n 	
+	
+  /subistituí pelo while do python para iterar pela lista, abaixo não funcionou, só tras o último comentário
+   ----------------------------------------------------------------------------------------------------------
+    -for coment in coments
+	  p = coment.comentario	
+
   /formulário de inserção de atualização
+   --------------------------------------------------
   -if formSeguir
     =formSeguir|n
 	
   /*substituir src com atvOrc.video*/
-  <iframe width="420" height="315" src="//www.youtube.com/embed/LpGmQZ5gpHQ" frameborder="0" allowfullscreen></iframe>
-  br 
+   -------------------------------------------------
+
   <img width="420" height="315" src="http://info.abril.com.br/noticias/blogs/gadgets/files/2013/03/487544_365192803580738_842401528_n.jpg" alt="some_text">
   
   /-markdown  
