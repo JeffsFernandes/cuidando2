@@ -8,7 +8,6 @@ from .models import Cidadao, Atividade_cidadao, Atividade_orcamento, Dados_site,
 #por que MyModel?
 from beaker.middleware import SessionMiddleware
 from datetime import datetime
-import warnings
 import itertools
 from BTrees.OOBTree import OOBTree
 import tweepy
@@ -199,7 +198,7 @@ def contato(request):
         # Apresentação do formulário
         return {'form': form.render()}
 
-@view_config(route_name='logout', permission='basica')
+@view_config(route_name='logout')
 def logout(request):
     """Página para logout"""
     headers = forget(request)
@@ -207,55 +206,137 @@ def logout(request):
     #request.session.pop_flash()
     return HTTPFound(location=request.route_url('inicial'), headers=headers)
 
+@view_config(route_name='loginTwitterAuth', renderer='loginTwitterAuth.slim',permission='comum')
+def loginTwitterAuth(request):	
+    """		       
+    Loga usuário com conta do twitter já autorizada: chamado a partir do login
+    testando com twitter da zi	
+    """	
+    auth = tweepy.OAuthHandler("MBX41ZNwjzKMObK8AHHfQ", "56hnTS8qMDg623XAIw4vdYEGpZFJtzS82VrXhNrILQ") 	
+	
+    #auth.set_access_token(cidadao.twitter_key, cidadao.twitter_secret)	
+
+    #teste com twitter da zi	
+    auth.set_access_token("91435451-hhGY5e7Ga2c3viHCV26kVN1vgLWQm0gJMvJHYOsbh", "rEeRld6tM4V45T1fKX6abNc8BMC7hDF1n6q0tuOKfi2ME")		
+    twitterApi = tweepy.API(auth) 		
+	
+    if twitterApi:
+        userInfo = twitterApi.me()	
+        print userInfo.__getstate__()	
+        #print userInfo.email	
+        headers = remember(request, "teste@testecorp.com")			
+        #headers = remember(request, "ilzi@testecorp.com")	
+        request.session.flash(u"Logado com twitter")	   
+        return HTTPFound(location=request.route_url('usuario'), headers=headers)	
+    else:
+        request.session.flash(u"Erro ao logar com twitter")	   	
+        return HTTPFound(location=request.route_url('login'))	
+		
+@view_config(route_name='authTwitter', renderer='authTwitter.slim',permission='comum')
+def authTwitter(request):	
+    """		       
+    Autoriza twitter para a conta do usuário logado
+    chamado em configurações
+    """	
+    auth = tweepy.OAuthHandler("MBX41ZNwjzKMObK8AHHfQ", "56hnTS8qMDg623XAIw4vdYEGpZFJtzS82VrXhNrILQ") 	
+	#token e secret da aplicação ->pegar no twitter			
+	
+    verifier = request.GET.get('oauth_verifier')	
+	
+    token = request.session.get('request_token')
+    #request.session.delete('request_token')
+    auth.set_request_token(token[0], token[1])
+
+    try:
+        auth.get_access_token(verifier)	
+    except tweepy.TweepError:
+        print 'Error! Failed to get access token.'		
+			
+    auth.set_access_token(auth.access_token.key, auth.access_token.secret)	
+
+    #auth.set_access_token("91435451-hhGY5e7Ga2c3viHCV26kVN1vgLWQm0gJMvJHYOsbh", "rEeRld6tM4V45T1fKX6abNc8BMC7hDF1n6q0tuOKfi2ME")		
+    twitterApi = tweepy.API(auth) 		
+	
+    if twitterApi:
+        userInfo = twitterApi.me()	
+        cidadao = request.db["usrTree"][authenticated_userid(request)]		
+        cidadao.twitter_key = auth.access_token.key
+        cidadao.twitter_secret = auth.access_token.secret
+        cidadao.login_twitter = userInfo.screen_name
+        transaction.commit()		
+        #headers = remember(request, "teste@testecorp.com")			
+        #headers = remember(request, "ilzi@testecorp.com")	
+        request.session.flash(u"Sua conta do twitter foi conectada ao Cuidando")	   
+        return HTTPFound(location=request.route_url('usuario'), headers=headers)	
+    else:
+        request.session.flash(u"Erro ao conectar com twitter")	   	
+        return HTTPFound(location=request.route_url('login'))	
+		
+@view_config(route_name='authTwitterAcc', renderer='authTwitterAcc.slim',permission='comum')
+def authTwitterAcc(request):
+    """		       
+    Apenas autoriza e redireciona usuário para twitter
+    """		
+	#autorização OAuth
+    auth = tweepy.OAuthHandler("MBX41ZNwjzKMObK8AHHfQ", "56hnTS8qMDg623XAIw4vdYEGpZFJtzS82VrXhNrILQ", request.route_url('loginTwitterAuth')) 	
+	#token e secret da aplicação ->pegar no twitter
+    authUrl = auth.get_authorization_url()	
+    request.session['request_token'] =  (auth.request_token.key, auth.request_token.secret)
+    request.session.save() 
+    try:
+        return HTTPFound(authUrl)		
+    except tweepy.TweepError:
+        print 'Error! Failed to get request token.'		
+		
+@view_config(route_name='loginTwitter', renderer='loginTwitter.slim',permission='comum')
+def loginTwitter(request):	
+    """		       
+    Login com twitter:
+    - verificar se já foi autorizado o app
+    - guardar token de acesso em algum lugar
+    - permitir acesso ao site com esse novo objeto....
+    """	
+    auth = tweepy.OAuthHandler("MBX41ZNwjzKMObK8AHHfQ", "56hnTS8qMDg623XAIw4vdYEGpZFJtzS82VrXhNrILQ") 	
+	#token e secret da aplicação ->pegar no twitter			
+	
+    verifier = request.GET.get('oauth_verifier')	
+	
+    token = request.session.get('request_token')
+    #request.session.delete('request_token')
+    auth.set_request_token(token[0], token[1])
+
+    try:
+        auth.get_access_token(verifier)	
+    except tweepy.TweepError:
+        print 'Error! Failed to get access token.'		
+			
+    auth.set_access_token(auth.access_token.key, auth.access_token.secret)	
+
+    #auth.set_access_token("91435451-hhGY5e7Ga2c3viHCV26kVN1vgLWQm0gJMvJHYOsbh", "rEeRld6tM4V45T1fKX6abNc8BMC7hDF1n6q0tuOKfi2ME")		
+    twitterApi = tweepy.API(auth) 		
+	
+    if twitterApi:
+        userInfo = twitterApi.me()	
+        cidadao = request.db["usrTree"][authenticated_userid(request)]		
+        cidadao.twitter_key = auth.access_token.key
+        cidadao.twitter_secret = auth.access_token.secret
+        cidadao.login_twitter = userInfo.screen_name
+        transaction.commit()		
+        #headers = remember(request, "teste@testecorp.com")			
+        #headers = remember(request, "ilzi@testecorp.com")	
+        request.session.flash(u"Usuário logado com twitter")	   
+        return HTTPFound(location=request.route_url('usuario'), headers=headers)	
+    else:
+        request.session.flash(u"Erro ao logar com twitter")	   	
+        return HTTPFound(location=request.route_url('login'))		
+	
 @view_config(route_name='login', renderer='login.slim')
 def login(request):
     """ 
     Página para login, site, face e twitter
 
-	#autorização básica
-    auth = tweepy.BasicAuthHandler(username, password)
-	
-	#autorização OAuth
-    auth = tweepy.OAuthHandler(consumer_token, consumer_secret) #token e secret da aplicação ->pegar no twitter
-	#se estiver utilizando um callback url
-    #auth = tweepy.OAuthHandler(consumer_token, consumer_secret, callback_url)
-
-	#busca o token de requisição
-    try:
-        redirect_url = auth.get_authorization_url()
-    except tweepy.TweepError:
-        print 'Error! Failed to get request token.'
-
-	#armazenar tokens na sessão - pseudo exemplo
-	#So now we can redirect the user to the URL returned to us earlier from the get_authorization_url() method.
-    session.set('request_token', (auth.request_token.key, auth.request_token.secret)
-
-    # Example using callback (web app)
-    verifier = request.GET.get('oauth_verifier')
-
-    # Example w/o callback (desktop)
-    verifier = raw_input('Verifier:')
-	
-    token = session.get('request_token')
-    session.delete('request_token')
-    auth.set_request_token(token[0], token[1])
-
-    try:
-        auth.get_access_token(verifier)
-    except tweepy.TweepError:
-        print 'Error! Failed to get access token.'	
-	
-	#guardar estes valores no banco
-    auth.access_token.key
-    auth.access_token.secret	
-	
-	#quando gardar, utilizar apenas isto para utilizar o twitter
-    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(key, secret)	
-	
-    twitterApi = tweepy.API(auth) 
     """
-	
+		
     esquema = FormLogin().bind(request=request)
     esquema.title = "Login"
 	#botoes nao aceitam frases como label = "esqueci a senha"
@@ -296,9 +377,11 @@ def login(request):
 def usuario(request):
     """
 	Página do perfil do usuário
-	"""
+    """
+
     cidadao = Cidadao("","")
     cidadao = request.db["usrTree"][authenticated_userid(request)]	
+
     return {
         'cidadao': cidadao
     }

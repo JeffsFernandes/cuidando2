@@ -47,13 +47,13 @@ class Cidadao(PersistentMapping):
     """	
     def __init__(
         self,
-        nome,
+        email,		
         senha,
         id="",
         nome_completo="",
         genero="",
         nascimento="",
-        email="",
+        nome="",
         rua="",
         bairro="",
         cidade="",
@@ -62,6 +62,8 @@ class Cidadao(PersistentMapping):
         foto="",#Blob(),
         informacoes="",
         login_twitter="",
+        twitter_key="",		
+        twitter_secret="",			
         login_facebook="",
         notificacoes_site= False,
         notificacoes_email= False,
@@ -84,6 +86,8 @@ class Cidadao(PersistentMapping):
         self.foto = foto
         self.informacoes = informacoes
         self.login_twitter = login_twitter
+        self.twitter_key = twitter_key
+        self.twitter_secret = twitter_secret		
         self.login_facebook = login_facebook
         self.notificacoes_site = notificacoes_site
         self.notificacoes_email = notificacoes_email

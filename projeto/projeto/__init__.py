@@ -73,7 +73,10 @@ def main(global_config, **settings):
     config.add_route('privacidade', '/privacidade')	
     config.add_route('termos', '/termos')	
     config.add_route('r_senha', '/r_senha')
-    config.add_route('rcad_senha', '/rcad_senha')		
-	
+    config.add_route('rcad_senha', '/rcad_senha')	
+    config.add_route('loginTwitter', '/loginTwitter')		
+    config.add_route('authTwitter', '/authTwitter')	
+    config.add_route('authTwitterAcc', '/authTwitterAcc')		
+    config.add_route('loginTwitterAuth', '/loginTwitterAuth')		
     config.scan()
     return config.make_wsgi_app()

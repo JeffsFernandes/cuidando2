@@ -1,5 +1,11 @@
--inherit base.slim
+﻿-inherit base.slim
 
 -block conteudo
   -if form
     =form|n
+
+  h4 Conecte-se às redes sociais
+  p
+    a href="" Facebook
+  p
+    a href="${request.route_url('authTwitter')}" Autorizar conta do Twitter
