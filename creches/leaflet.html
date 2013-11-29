@@ -21,12 +21,11 @@
 	<div id="map" style="width: 1024px; height: 768px"></div>
 
 	<script>
-		/*
-		var arq = $.get("teste.csv");
-		var string = Object.toString(arq);
-		console.log(string.responseText);
-		var teste = $.csv.toArray(string);
-		console.log(teste);*/
+		$.get("teste.csv", function(data){
+			console.log(data);
+			var teste = $.csv.toArrays(data);
+			console.log(teste);
+		});
 
 		var cities = new L.LayerGroup();
 
