@@ -11,6 +11,9 @@ from datetime import datetime
 import itertools
 from BTrees.OOBTree import OOBTree
 import tweepy
+import facebook
+import urllib
+#from facebook import Facebook
 
 from pyramid.httpexceptions import (
     HTTPFound,
@@ -286,7 +289,7 @@ def authTwitterAcc(request):
     try:
         return HTTPFound(authUrl)		
     except tweepy.TweepError:
-        print 'Error! Failed to get request token.'		
+        print 'Error! Failed to get request token.'	
 		
 @view_config(route_name='loginTwitter', renderer='loginTwitter.slim',permission='comum')
 def loginTwitter(request):	
@@ -329,7 +332,38 @@ def loginTwitter(request):
     else:
         request.session.flash(u"Erro ao logar com twitter")	   	
         return HTTPFound(location=request.route_url('login'))		
-	
+					
+@view_config(route_name='authFacebook', renderer='authFacebook.slim',permission='comum')
+def authFacebook(request):
+    """		       
+    Apenas autoriza e redireciona usuário para twitter
+    """		
+    #autorização OAuth
+    #fbApi = Facebook("473549246060347", "ba198578f77ea264f8ed4053dd323054")	
+	#token e secret da aplicação ->pegar no face
+    
+    args = dict(client_id="473549246060347", redirect_uri=request.route_url('loginAuthFace'))	
+
+    try:
+        return HTTPFound("https://graph.facebook.com/oauth/authorize?" + urllib.urlencode(args))	
+    except:
+        print 'Error! Failed to get request token.'	
+        return HTTPFound(request.route_url('login'))		
+		
+@view_config(route_name='loginFacebook', renderer='loginFacebook.slim',permission='comum')
+def loginFacebook(request):		
+    try:
+        return HTTPFound(request.route_url('login'))		
+    except:
+        print 'Error! Failed to get request token.'			
+		
+@view_config(route_name='loginAuthFace', renderer='loginAuthFace.slim',permission='comum')
+def loginAuthFace(request):			
+    try:
+        return HTTPFound(request.route_url('login'))		
+    except:
+        print 'Error! Failed to get request token.'				
+
 @view_config(route_name='login', renderer='login.slim')
 def login(request):
     """ 

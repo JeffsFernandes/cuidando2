@@ -65,6 +65,8 @@ class Cidadao(PersistentMapping):
         twitter_key="",		
         twitter_secret="",			
         login_facebook="",
+        facebook_url = "",
+        facebook_token = "", #fb OAUTH access token		
         notificacoes_site= False,
         notificacoes_email= False,
         atualizacoes_pontos= False,
@@ -89,6 +91,8 @@ class Cidadao(PersistentMapping):
         self.twitter_key = twitter_key
         self.twitter_secret = twitter_secret		
         self.login_facebook = login_facebook
+        self.facebook_url = facebook_url
+        self.facebook_token = facebook_token		
         self.notificacoes_site = notificacoes_site
         self.notificacoes_email = notificacoes_email
         self.atualizacoes_pontos = atualizacoes_pontos
