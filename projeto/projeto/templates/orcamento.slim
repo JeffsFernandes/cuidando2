@@ -1,4 +1,4 @@
-﻿/* Template dos dados individuais dos orçamentos */
+﻿/* Template dos dados dos orçamentos */
  --------------------------------------------------
 -inherit base.slim
 
@@ -7,11 +7,22 @@
   p = orcamento.atividade
   p = orcamento.endereco  
   p = orcamento.descricao
+	  
+  /tweetar página do orçamento	
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="${request.route_url('orcamento')}" data-text="Cuidando do meu bairro" data-via="cuidandoDoMeuBairro" data-lang="pt" data-hashtags="cuidando2">Tweetar</a>	
+    
+  /curtir
+  <div class="fb-like" data-href="${request.route_url('orcamento')}" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>	
+	  
+  /compartilhar	  
+  <div class="fb-share-button" data-href="${request.route_url('orcamento')}" data-type="button_count"></div>  
 
-  /formmulário para upload de fotos
-   -------------------------
+  
   -if formFoto
     =formFoto|n
+	
+  /exibir as fotos
+   --------------------------------  
 
   /exibição dos vídeos cadastrados
    -------------------------	
@@ -20,24 +31,51 @@
     limit = len(videos)
 	
   -while i < limit
-    p = videos[i].link	
+
+    /frame do vídeo	
     <iframe width="420" height="315" src="${videos[i].link}" frameborder="0" allowfullscreen></iframe>
     br 	
+	
+    /tweetar video	
+    <a href="https://twitter.com/share" class="twitter-share-button" data-url="${videos[i].link}" data-text="Cuidando do meu bairro" data-via="cuidandoDoMeuBairro" data-lang="pt" data-hashtags="cuidando2">Tweetar</a>	
+    
+    /curtir
+    <div class="fb-like" data-href="${videos[i].link}" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>	
+	  
+    /compartilhar	  
+    <div class="fb-share-button" data-href="${videos[i].link}" data-type="button_count"></div>	
+    br 
+    br
 	
     -python	
       i +=1
 	  
-  /formmulário para upload de vídeos
+  /formulário para upload de vídeos
    ------------------------- 
   -if formVideo
     =formVideo|n  
 
+  /início dos comentários
+   -------------------------  
   -python
     i = 0
     limit = len(coments)
 	
   -while i < limit
+    / mostrando comentários  
     p = coments[i].comentario
+      i
+        p por: ${coments[i].cidadao} - ${coments[i].data}
+  
+    /tweetar video	
+    <a href="https://twitter.com/share" class="twitter-share-button" data-url="${request.route_url('orcamento')}" data-text="${coments[i].comentario}" data-via="cuidandoDoMeuBairro" data-lang="pt" data-hashtags="cuidando2">Tweetar</a>	
+    
+    /curtir
+    <div class="fb-like" data-href="${request.route_url('orcamento')}" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>	
+	  
+    /compartilhar	  
+    <div class="fb-share-button" data-href="${request.route_url('orcamento')}" data-type="button_count"></div>		
+	
     -python	
       j = 0
       limitj = len(coments[i].respostas)
@@ -79,6 +117,5 @@
 
   <img width="420" height="315" src="http://info.abril.com.br/noticias/blogs/gadgets/files/2013/03/487544_365192803580738_842401528_n.jpg" alt="some_text">
   
-  /-markdown  
-    [[embed url=http://youtu.be/LpGmQZ5gpHQ]]
+
 	
