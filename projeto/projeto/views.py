@@ -403,7 +403,6 @@ def login(request):
     #não entra nesse elif
     #elif 'Esqueci' in request.POST:  
     elif 'Esqueci_a_senha' in request.POST:  
-        print("aaaaaaaaaaaa")
         return HTTPFound(location=request.route_url('r_senha'))
     else:
         return {'form': form.render()}
