@@ -596,7 +596,8 @@ def orcamento(request):
 		#adiciona a resposta ao comentário pai, conforme o id do form de resposta
         comentPai = atv_orc.midia_coment[posted_formid] 
         comentPai.respostas.append(coment)		
-	
+        comentPai._p_changed = 1	
+		
         transaction.commit()	
         return HTTPFound(location=request.route_url('orcamento'))			
     elif 'Salvar' in request.POST:
