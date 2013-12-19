@@ -374,8 +374,8 @@ def login(request):
     esquema = FormLogin().bind(request=request)
     esquema.title = "Login"
 	#botoes nao aceitam frases como label = "esqueci a senha"
-    #form = deform.Form(esquema, buttons=('Entrar', 'Esqueci a senha'))
-    form = deform.Form(esquema, buttons=('Entrar', 'Esqueci'))
+    form = deform.Form(esquema, buttons=('Entrar', 'Esqueci a senha'))
+    #form = deform.Form(esquema, buttons=('Entrar', 'Esqueci'))
     if authenticated_userid(request):
        request.session.flash(u"Usuário já está logado, caso queira entrar com usuário diferente, faça o logout.")	
        return HTTPFound(location=request.route_url('usuario'))	   
@@ -401,8 +401,9 @@ def login(request):
             request.session.flash(u"Email ou senha inválidos")		
         return {'form': form.render()}
     #não entra nesse elif
-	#elif 'Esqueci a senha' in request.POST:  
-    elif 'Esqueci' in request.POST:  
+    #elif 'Esqueci' in request.POST:  
+    elif 'Esqueci_a_senha' in request.POST:  
+        print("aaaaaaaaaaaa")
         return HTTPFound(location=request.route_url('r_senha'))
     else:
         return {'form': form.render()}

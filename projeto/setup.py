@@ -21,6 +21,8 @@ requires = [
     'pyramid_deform',
     'pyramid_beaker',
     'deform_bootstrap',
+    'tweepy',
+    'facebook',
     #'repoze.folder',
     #'repoze.retry',
     #'repoze.tm2==1.0',
