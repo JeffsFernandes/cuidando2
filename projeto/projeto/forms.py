@@ -280,15 +280,6 @@ class FormContato(CSRFSchema):
     """ 
     Formulário para contato com equipe do site
     """
-    nome = SchemaNode(
-        String(),
-        validator=All(
-            Length(max=32),
-            #Function(verif_nome_unico, u"Nome já cadastrado"),
-            Regex("^(\w)*$", "Usar apenas letras, números ou _"),
-        ),
-        description='Digite seu nome de usuário'
-    )
     assunto = SchemaNode(
         String(),
         validator=All(

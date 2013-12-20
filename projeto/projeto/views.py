@@ -13,6 +13,9 @@ from BTrees.OOBTree import OOBTree
 import tweepy
 import facebook
 import urllib
+from pyramid_mailer import get_mailer
+from pyramid_mailer.message import Message
+
 #from facebook import Facebook
 
 from pyramid.httpexceptions import (
@@ -181,15 +184,25 @@ def contato(request):
         except deform.ValidationFailure as e:
             return {'form': e.render()}
 
-        sender = request.POST.get("email")
-        receivers = ['silvailziane@yahoo.com.br']	
-        message = request.POST.get("assunto")		
-        						
+        #sender = request.POST.get("email")
+        #receivers = ['silvailziane@yahoo.com.br']	
+        #message = request.POST.get("assunto")	
+				        						
         try:
             #s = smtplib.SMTP( [host [, port [, local_hostname]]] )
-            s = smtplib.SMTP('pop.mail.yahoo.com.br',587)
-            smtpObj.sendmail(sender, receivers, message)	
-            s.quit()	        
+            #s = smtplib.SMTP('pop.mail.yahoo.com.br',587)
+            #smtpObj.sendmail(sender, receivers, message)	
+            #s.quit()			
+            mailer = get_mailer(request)		
+			
+            message = Message(
+                subject=request.POST.get("assunto"),
+                sender= request.POST.get("email"), #"admin@cuidando.org",
+                recipients=['silvailziane@yahoo.com.br'],
+                body=request.POST.get("mensagem")
+            )		
+            mailer.send(message)	
+			
             print "Successfully sent email"
 		#except SMTPException:
         except:
