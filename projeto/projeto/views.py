@@ -15,6 +15,7 @@ import facebook
 import urllib
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
+from pyramid_mailer.mailer import Mailer
 
 #from facebook import Facebook
 
@@ -143,6 +144,7 @@ def configuracao(request):
     cidadao = Cidadao("","")
     cidadao = request.db["usrTree"][authenticated_userid(request)]	
 	#verificar se cidadão está preenchido
+    appstruct = record_to_appstruct(cidadao)	
 	
     esquema = FormConfigurar().bind(request=request)
     esquema.title = "Configuração de usuário"	
@@ -150,12 +152,20 @@ def configuracao(request):
 
     if 'Salvar' in request.POST:
         # Validação do formulário
+        cidadao = merge_session_with_post(cidadao, request.POST.items())	
+        appstruct = record_to_appstruct(cidadao)		
         try:
+            #como recarregar o form para evitar o erro de CRSF?		
+            esquema = FormConfigurar().bind(request=request)
+            esquema.title = "Configuração de usuário"		
+            form = deform.Form(esquema, buttons=('Salvar', 'Excluir'))		
+            form.render(appstruct)  			
             appstruct = form.validate(request.POST.items())
+            #form.validate(request.POST.items())
+            print "ok"
         except deform.ValidationFailure as e:
             return {'form': e.render()}
         
-        cidadao = merge_session_with_post(cidadao, request.POST.items())
         transaction.commit()		
         return HTTPFound(location=request.route_url('usuario'))
     elif 'Excluir' in request.POST:
@@ -165,8 +175,9 @@ def configuracao(request):
         return HTTPFound(location=request.route_url('inicial'))		
     else:
         # Apresentação do formulário
-        appstruct = record_to_appstruct(cidadao)
-        return{'form':form.render(appstruct=appstruct)}	
+        #return{'form':form.render(appstruct=appstruct)}	
+        return{'form':form.render(appstruct)}	
+        #return{'form':form.render()}			
 		
 @view_config(route_name='contato', renderer='contato.slim')
 def contato(request):
@@ -193,8 +204,8 @@ def contato(request):
             #s = smtplib.SMTP('pop.mail.yahoo.com.br',587)
             #smtpObj.sendmail(sender, receivers, message)	
             #s.quit()			
-            mailer = get_mailer(request)		
-			
+            #mailer = get_mailer(request)		
+            mailer = Mailer()			
             message = Message(
                 subject=request.POST.get("assunto"),
                 sender= request.POST.get("email"), #"admin@cuidando.org",
@@ -202,7 +213,7 @@ def contato(request):
                 body=request.POST.get("mensagem")
             )		
             mailer.send(message)	
-			
+            transaction.commit() 	
             print "Successfully sent email"
 		#except SMTPException:
         except:
