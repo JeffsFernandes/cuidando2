@@ -23,6 +23,7 @@ requires = [
     'deform_bootstrap',
     'tweepy',
     'facebook',
+    'pyramid_mailer',
     #'repoze.folder',
     #'repoze.retry',
     #'repoze.tm2==1.0',
