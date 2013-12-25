@@ -24,6 +24,8 @@ requires = [
     'tweepy',
     'facebook',
     'pyramid_mailer',
+    'venusian',
+    'webob',
     #'repoze.folder',
     #'repoze.retry',
     #'repoze.tm2==1.0',

@@ -155,14 +155,12 @@ def configuracao(request):
         cidadao = merge_session_with_post(cidadao, request.POST.items())	
         appstruct = record_to_appstruct(cidadao)		
         try:
-            #como recarregar o form para evitar o erro de CRSF?		
             esquema = FormConfigurar().bind(request=request)
             esquema.title = "Configuração de usuário"		
             form = deform.Form(esquema, buttons=('Salvar', 'Excluir'))		
-            form.render(appstruct)  			
+            form.render(appstruct)  		
+	
             appstruct = form.validate(request.POST.items())
-            #form.validate(request.POST.items())
-            print "ok"
         except deform.ValidationFailure as e:
             return {'form': e.render()}
         
@@ -174,10 +172,9 @@ def configuracao(request):
         headers = forget(request)
         return HTTPFound(location=request.route_url('inicial'))		
     else:
-        # Apresentação do formulário
-        #return{'form':form.render(appstruct=appstruct)}	
+        # Apresentação do formulário	
         return{'form':form.render(appstruct)}	
-        #return{'form':form.render()}			
+		
 		
 @view_config(route_name='contato', renderer='contato.slim')
 def contato(request):
@@ -491,11 +488,11 @@ def orcamento(request):
     """	
     esquemaFoto = FormOrcFoto().bind(request=request)
     esquemaFoto.title = "Foto"
-    formFoto = deform.Form(esquemaFoto, buttons=('UploadF',))	
+    formFoto = deform.Form(esquemaFoto, buttons=('Upload Foto',))	
 
     esquemaVideo = FormOrcVideo().bind(request=request)
     esquemaVideo.title = "Video"
-    formVideo = deform.Form(esquemaVideo, buttons=('UploadV',))		
+    formVideo = deform.Form(esquemaVideo, buttons=('Upload Video',))		
 	
     esquemaSeguir = FormSeguirAtv().bind(request=request)
     esquemaSeguir.title = "Seguir atualizações"
@@ -511,7 +508,8 @@ def orcamento(request):
 	
     #atv_orc = Atividade_orcamento("","")
     atv_orc = Atividade_cidadao("","")
-    atv_orc = request.db["atvTree"]["TesteComent2"]		
+    #modificar o orçamento a ser exibido na página	
+    atv_orc = request.db["atvTree"]["testeC5"]		
 	#atividade vinda do mapa
     #atv_orc = request.db["orcTree"]
 	#atv_orc = request.db["atvTree"]
@@ -520,6 +518,7 @@ def orcamento(request):
     # envia para o template uma lista com forms de resposta	
     i = 0
     formsResps = []	
+
     for coment in atv_orc.midia_coment:
         formResp = deform.Form(esquemaResp, buttons=('Responder',), formid=str(i))
         formsResps.append(formResp.render())		
@@ -528,7 +527,7 @@ def orcamento(request):
     cidadao = Cidadao("","")
     cidadao = request.db["usrTree"][authenticated_userid(request)]		
 	
-    if 'UploadF' in request.POST:
+    if 'Upload_Foto' in request.POST:
         try:
             formFoto.validate(request.POST.items())
         except deform.ValidationFailure as e:
@@ -541,7 +540,7 @@ def orcamento(request):
         Dados_site.addFoto(dadosSite)
         transaction.commit() 		
         return HTTPFound(location=request.route_url('orcamento'))	
-    elif 'UploadV' in request.POST:
+    elif 'Upload_Video' in request.POST:
         try:
             formVideo.validate(request.POST.items())
         except deform.ValidationFailure as e:
@@ -570,9 +569,11 @@ def orcamento(request):
         return HTTPFound(location=request.route_url('orcamento'))		
     elif 'Enviar' in request.POST:
         try:
-            print "não validando form de comentário"		
+            print "não validando form de comentário"
+            esquema = FormOrcamento().bind(request=request)
+            form = deform.Form(esquema, buttons=('Enviar',))			
 			#não funcionaaaaa por que a validação dá errado????
-            #form.validate(request.POST.items())
+            form.validate(request.POST.items())
         except deform.ValidationFailure as e:
             print "form de comentário deu erro"			
             return {'form': e.render()}				

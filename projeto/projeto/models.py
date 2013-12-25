@@ -178,17 +178,16 @@ class Atividade_cidadao(Atividade):
         descricao ="",
         data ="",
         tipo ="",
-
     ):
+        Atividade.__init__(self, atividade, descricao)
         self.cidadao = cidadao
-        self.atividade = atividade
-        self.descricao = descricao		
+        #self.atividade = atividade
+        #self.descricao = descricao		
         self.data = data
         self.tipo = tipo
 
 		#auxiliar para saber indice do comentário pai....
         self.aux =0
-
 			
 
 class Atividade_orcamento(Atividade):
@@ -207,7 +206,7 @@ class Atividade_orcamento(Atividade):
         orgao="",
 
     ):
-
+        Atividade.__init__(self, atividade, descricao)
         self.atividade = atividade
         self.orcado = orcado
         self.atualizado = atualizado    
@@ -245,7 +244,8 @@ class Midia_foto(Midia):
         imagem,
 
     ):
-
+	    #data e cidadao?
+        Midia.__init__(self)
         self.imagem = imagem 
 		
         self.denuncias = []			
@@ -260,11 +260,11 @@ class Midia_video(Midia):
         link= "",
 
     ):
-
+	    #data e cidadao?
+        Midia.__init__(self)
         self.linkOrig = link 
         self.link = ""		
-
-        self.denuncias = []	        
+     
 
 #comentamos sobre lista de comentarios....
 class Midia_comentario(Midia):
@@ -279,14 +279,14 @@ class Midia_comentario(Midia):
         comentarioPai="",	
 
     ):
-
+	    #data e cidadao?
+        Midia.__init__(self)
         self.comentario = comentario
         self.data = data    
         self.comentarioPai = comentarioPai  
 		
         self.respostas = []		
 		
-        self.denuncias = []	#pensando bem.. nao sei se eh necessario no comentario
 	
 #ira se transformar em uma hash
 #deixa ai por enquanto	
