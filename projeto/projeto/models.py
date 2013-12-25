@@ -171,20 +171,11 @@ class Atividade_cidadao(Atividade):
     """	
     def __init__(
         self,
-        cidadao ="",
-		#nao lembro o que era essa atividade... sao so titulo??
-		#atividade_cidadao deveria herdar de atividade
-        atividade ="",
-        descricao ="",
-        data ="",
-        tipo ="",
     ):
-        Atividade.__init__(self, atividade, descricao)
-        self.cidadao = cidadao
-        #self.atividade = atividade
-        #self.descricao = descricao		
-        self.data = data
-        self.tipo = tipo
+        Atividade.__init__(self, "", "")
+        self.cidadao = ""	
+        self.data = ""
+        self.tipo = ""
 
 		#auxiliar para saber indice do comentário pai....
         self.aux =0
@@ -197,23 +188,15 @@ class Atividade_orcamento(Atividade):
     """	
     def __init__(
         self,
-        atividade = "",
-        orcado ="",
-        atualizado = "",
-        ano="",
-        empenhado="",
-        liquidado="",
-        orgao="",
-
     ):
         Atividade.__init__(self, atividade, descricao)
-        self.atividade = atividade
-        self.orcado = orcado
-        self.atualizado = atualizado    
-        self.ano = ano
-        self.empenhado = empenhado
-        self.liquidado = liquidado    
-        self.orgao = orgao
+        self.atividade = ""
+        self.orcado = 0
+        self.atualizado = 0    
+        self.ano = 0
+        self.empenhado = 0
+        self.liquidado = 0    
+        self.orgao = ""
 		
 
 class Midia(Persistent):
@@ -224,11 +207,8 @@ class Midia(Persistent):
         self,
         data,
         cidadao,
-        atividade="",		
-
     ):
 
-        self.atividade = atividade
         self.data = data
         self.cidadao = cidadao 
 		
@@ -242,13 +222,13 @@ class Midia_foto(Midia):
     def __init__(
         self,
         imagem,
-
+        data,
+        cidadao,		
     ):
 	    #data e cidadao?
-        Midia.__init__(self)
+        Midia.__init__(self, data, cidadao)
         self.imagem = imagem 
-		
-        self.denuncias = []			
+				
 
 class Midia_video(Midia):
     """
@@ -257,11 +237,12 @@ class Midia_video(Midia):
     """	
     def __init__(
         self,
-        link= "",
-
+        linkOrig,
+        data,
+        cidadao,
     ):
 	    #data e cidadao?
-        Midia.__init__(self)
+        Midia.__init__(self, data, cidadao)
         self.linkOrig = link 
         self.link = ""		
      
@@ -276,21 +257,17 @@ class Midia_comentario(Midia):
         self,
         comentario,
         data,
-        comentarioPai="",	
-
+        cidadao,		
     ):
 	    #data e cidadao?
-        Midia.__init__(self)
+        Midia.__init__(self, data, cidadao)
         self.comentario = comentario
-        self.data = data    
-        self.comentarioPai = comentarioPai  
 		
         self.respostas = []		
 		
 	
 #ira se transformar em uma hash
 #deixa ai por enquanto	
-
 class Denuncia(Persistent):
     """
     Classe que irá armazenar as denúncias relacionadas ás mídias inseridas

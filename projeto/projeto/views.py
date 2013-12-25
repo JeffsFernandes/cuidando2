@@ -509,7 +509,7 @@ def orcamento(request):
     #atv_orc = Atividade_orcamento("","")
     atv_orc = Atividade_cidadao("","")
     #modificar o orçamento a ser exibido na página	
-    atv_orc = request.db["atvTree"]["testeC5"]		
+    atv_orc = request.db["atvTree"]["testeC8"]		
 	#atividade vinda do mapa
     #atv_orc = request.db["orcTree"]
 	#atv_orc = request.db["atvTree"]
@@ -553,15 +553,11 @@ def orcamento(request):
         Dados_site.addAtual(dadosSite, atv_orc) 
         Dados_site.addVideo(dadosSite)			
 		
-        video = Midia_video("")
+        video = Midia_video(request.POST.get('video'), datetime.now(), authenticated_userid(request))
 		#bolar alguma validação de lnk?
-        video.linkOrig = request.POST.get('video')
-		
         #colocar essas funções no model		
         video.link = video.linkOrig.replace('.com/','.com/embed/')		
         video.link = video.linkOrig.replace('watch?v=','embed/')				
-        video.data = datetime.now()	
-        video.cidadao = authenticated_userid(request)	
 		
         Atividade_cidadao.addVideo(atv_orc, video)		
         transaction.commit()				
@@ -569,11 +565,10 @@ def orcamento(request):
         return HTTPFound(location=request.route_url('orcamento'))		
     elif 'Enviar' in request.POST:
         try:
-            print "não validando form de comentário"
             esquema = FormOrcamento().bind(request=request)
-            form = deform.Form(esquema, buttons=('Enviar',))			
-			#não funcionaaaaa por que a validação dá errado????
-            form.validate(request.POST.items())
+            form = deform.Form(esquema, buttons=('Enviar',))
+            form.render()			
+            appstruct = form.validate(request.POST.items())
         except deform.ValidationFailure as e:
             print "form de comentário deu erro"			
             return {'form': e.render()}				
@@ -584,11 +579,7 @@ def orcamento(request):
         Dados_site.addAtual(dadosSite, atv_orc)
         Dados_site.addComent(dadosSite)	
 
-        coment = Midia_comentario("", "")
-        coment.comentario = request.POST.get('comentario')
-        coment.data = datetime.now()	
-        coment.cidadao = authenticated_userid(request)	
-        coment.atividade = "teste"
+        coment = Midia_comentario(request.POST.get('comentario'), datetime.now(), authenticated_userid(request))
         transaction.commit()		
 		#verificar como vai ficar com a atividade orçamentária
 
@@ -597,9 +588,11 @@ def orcamento(request):
         return HTTPFound(location=request.route_url('orcamento'))	
     elif 'Responder' in request.POST:
         try:
-            print "não validando form de resposta de comentário"	
-			#não funcionaaaaa por que a validação dá errado????
-            #formResp.validate(request.POST.items())
+            esquemaResp = FormOrcamento().bind(request=request)
+            formResp = deform.Form(esquemaResp, buttons=('Responder',))	
+            formResp.render()	
+
+            formResp.validate(request.POST.items())
         except deform.ValidationFailure as e:			
             return {'form': e.render()}			
 		#pega o id do form que enviou a resposta do comentário
@@ -611,11 +604,7 @@ def orcamento(request):
         Dados_site.addAtual(dadosSite, atv_orc)
         Dados_site.addComent(dadosSite)	
 
-		#como faço para amarrar a resposta no objeto pai?...
-        coment = Midia_comentario("", "")
-        coment.comentario = request.POST.get('comentario')
-        coment.data = datetime.now()	
-        coment.cidadao = authenticated_userid(request)
+        coment = Midia_comentario(request.POST.get('comentario'), datetime.now(), authenticated_userid(request))
         transaction.commit()		
 
 		#adiciona a resposta ao comentário pai, conforme o id do form de resposta
@@ -689,8 +678,8 @@ def inserir_ponto(request):
             Dados_site.addAtvUsr(dadosSite)
             transaction.commit()
             request.session.flash(u"Atividade de usuário cadastrada com sucesso.")
-		#teste	
-        return HTTPFound(location=request.route_url('lista'))
+		#retorno -> levar atividade inserida
+        return HTTPFound(location=request.route_url('orcamento'))
     else:
         return {'form': form.render()}
 
