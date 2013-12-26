@@ -49,58 +49,35 @@ class Cidadao(PersistentMapping):
         self,
         email,		
         senha,
-        id="",
-        nome_completo="",
-        genero="",
-        nascimento="",
-        nome="",
-        rua="",
-        bairro="",
-        cidade="",
-        estado="",
-		#como guardar a imagem?
-        foto="",#Blob(),
-        informacoes="",
-        login_twitter="",
-        twitter_key="",		
-        twitter_secret="",			
-        login_facebook="",
-        facebook_url = "",
-        facebook_token = "", #fb OAUTH access token		
-        notificacoes_site= False,
-        notificacoes_email= False,
-        atualizacoes_pontos= False,
-        atualizacoes_eventos= False,
-    ):
-
-        self.nome = nome
+    ):        
         self.senha = senha
-		
-        self.id = id
-        self.nome_completo = nome_completo
-        self.genero = genero
-        self.nascimento = nascimento
         self.email = email
-        self.rua = rua
-        self.bairro = bairro
-        self.cidade = cidade
-        self.estado = estado
-        self.foto = foto
-        self.informacoes = informacoes
-        self.login_twitter = login_twitter
-        self.twitter_key = twitter_key
-        self.twitter_secret = twitter_secret		
-        self.login_facebook = login_facebook
-        self.facebook_url = facebook_url
-        self.facebook_token = facebook_token		
-        self.notificacoes_site = notificacoes_site
-        self.notificacoes_email = notificacoes_email
-        self.atualizacoes_pontos = atualizacoes_pontos
-        self.atualizacoes_eventos = atualizacoes_eventos
+		
+        self.id =""
+        self.nome_completo = ""
+        self.genero = ""
+        self.nascimento = ""
+        self.nome = ""
+        self.rua = ""
+        self.bairro = ""
+        self.cidade = ""
+        self.estado = ""
+        self.foto = ""
+        self.informacoes = ""
+        self.login_twitter = ""
+        self.twitter_key = ""
+        self.twitter_secret = ""		
+        self.login_facebook = ""
+        self.facebook_url = ""
+        self.facebook_token = ""		
+        self.notificacoes_site = False
+        self.notificacoes_email = False
+        self.atualizacoes_pontos = False
+        self.atualizacoes_eventos = False
         	
         self.pontos_inseridos = []		
         self.pontos_a_seguir = []
-		#denúncias de outros usuários para este
+		#denúncias das mídias que este usuário inseriu
         self.denuncias = []	
 		
     def addSeguir(self, Atividade, inserir):
@@ -111,7 +88,8 @@ class Cidadao(PersistentMapping):
         if inserir:
 		    #segundo if necessário para não adicionar novamente a mesma atividade na lista
             if Atividade.atividade not in self.pontos_a_seguir:	
-                self.pontos_a_seguir.append(Atividade.atividade)				
+                self.pontos_a_seguir.append(Atividade.atividade)		
+				# inserir só o nome da atividade?.....
         else:		
             for x in self.pontos_a_seguir:
                 if Atividade.atividade == x:
@@ -121,8 +99,13 @@ class Cidadao(PersistentMapping):
 			
         self._p_changed = 1	
 
-    		
-
+    def addInseridos(self, Atividade):
+        self.addSeguir(self, Atividade, true)
+        self.pontos_inseridos.append(Atividade.atividade)
+		# inserir só o nome da atividade?.....
+        self._p_changed = 1			
+        		   		
+#é necessário?? os usuários já teem as listas: pontos_inseridos e pontos_a_seguir
 class Notificacao(Persistent):
     """
     Classe para armazenar as atividades a serem notificadas para o usuário quando há atualizações
@@ -140,13 +123,10 @@ class Atividade(Persistent):
     """	
     def __init__(
         self,
-        atividade ="",
-        descricao ="",
-
     ):
-
-        self.atividade = atividade
-        self.descricao = descricao
+		#usar algum número aleatório como id? Acho melhor do que usar o nome da atividade....
+        self.atividade = ""
+        self.descricao = ""
 		
         self.midia_video = []	   
         self.midia_foto = []	
@@ -172,7 +152,7 @@ class Atividade_cidadao(Atividade):
     def __init__(
         self,
     ):
-        Atividade.__init__(self, "", "")
+        Atividade.__init__(self)
         self.cidadao = ""	
         self.data = ""
         self.tipo = ""
@@ -189,7 +169,7 @@ class Atividade_orcamento(Atividade):
     def __init__(
         self,
     ):
-        Atividade.__init__(self, atividade, descricao)
+        Atividade.__init__(self)
         self.atividade = ""
         self.orcado = 0
         self.atualizado = 0    
@@ -213,6 +193,11 @@ class Midia(Persistent):
         self.cidadao = cidadao 
 		
         self.denuncias = []		
+
+    def addDenuncia(self,Denuncia):
+		#adiciona comentario   
+        self.denuncias.append(Denuncia)
+        self._p_changed = 1			
 
 class Midia_foto(Midia):
     """
@@ -274,43 +259,28 @@ class Denuncia(Persistent):
     """	
     def __init__(
         self,
-        midia,
         descricao,
-        atividade,
-
+        denunciante		
     ):
-        self.midia = midia
+        self.denunciante = denunciante
         self.descricao = descricao
-        self.atividade = atividade
 		
-        self.video = []       
-        self.foto = [] 	
-        self.coment = [] 		
 
 class Dados_site(PersistentMapping):
     """
     Objeto único no bd para inserir os dados estatísticos do site
     """
     def __init__(
-        self,
-		# na atividade a lista não ficou no init.... qual  diferença?
-        atualiz_atv = [],
-        destaque_atv = [],		
-        qtde_usr = 0,
-        qtde_atv_orc = 0,
-        qtde_atv_usr = 0,
-        qtde_fotos = 0,
-        qtde_videos = 0,
-        qtde_coment = 0,
+        self
     ):
-        self.atualiz_atv = atualiz_atv
-        self.destaque_atv = destaque_atv
-        self.qtde_usr = qtde_usr
-        self.qtde_atv_orc = qtde_atv_orc
-        self.qtde_atv_usr = qtde_atv_usr
-        self.qtde_fotos = qtde_fotos
-        self.qtde_videos = qtde_videos
-        self.qtde_coment = qtde_coment
+        self.atualiz_atv = []
+        self.destaque_atv = []
+        self.qtde_usr = 0
+        self.qtde_atv_orc = 0
+        self.qtde_atv_usr = 0
+        self.qtde_fotos = 0
+        self.qtde_videos = 0
+        self.qtde_coment = 0
 
 	#está inserindo o objeto todo da atividade, não sei se é melhor só guardar o nome...
 	# mas aí o interessante é redirecionar o objeto para o link a ser aberto....
@@ -325,38 +295,39 @@ class Dados_site(PersistentMapping):
         self._p_changed = 1
 		
     def addAtvUsr(self):
-		#adiciona contador de atividades inseridas pelo usuario
-        #não tem uma forma mais bonita de adicionar 1?...
+		#adiciona ao contador de atividades inseridas pelo usuario
+        #não tem uma forma mais bonita de adicionar 1?... Tipo um ++?...
         self.qtde_atv_usr = self.qtde_atv_usr +1
 
     def addAtvOrc(self):
-		#adiciona contador de atividades de orçamento
+		#adiciona ao contador de atividades de orçamento
 		#provavelmente só chamada da importação dos dados do 1.0
         self.qtde_atv_orc = self.qtde_atv_orc +1
 		
     def addUsr(self):
-		#adiciona contador de usuário cadastrados
+		#adiciona ao contador de usuário cadastrados
         self.qtde_usr = self.qtde_usr +1
 		
     def addFoto(self):
-		#adiciona contador de usuário cadastrados
+		#adiciona ao contador de usuário cadastrados
         self.qtde_fotos = self.qtde_fotos +1
 		
     def addVideo(self):
-		#adiciona contador de usuário cadastrados
+		#adiciona ao contador de usuário cadastrados
         self.qtde_videos = self.qtde_videos +1
 		
     def addComent(self):
-		#adiciona contador de usuário cadastrados
+		#adiciona ao contador de usuário cadastrados
         self.qtde_coment = self.qtde_coment +1
-		
+
+#para mostrar na página do usuário as atualizações que ele segue	
+#daí essa lista fica na atividade.. com os usuários que a seguem.. ainda não está sendo utilizado	
 class Atualizacao_Usr(PersistentMapping):
 
     def __init__(
         self,
-        usuario = []
     ):
-        self.usuario = usuario
+        self.usuario = []
 
     def addAtual(self, usuario):
         self.usuario.append(usuario)

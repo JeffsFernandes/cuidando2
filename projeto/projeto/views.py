@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pyramid.view import view_config
-from .models import Cidadao, Atividade_cidadao, Atividade_orcamento, Dados_site, Midia_comentario, Midia_video
+from .models import Cidadao, Atividade_cidadao, Atividade_orcamento, Dados_site, Midia, Midia_comentario, Midia_video, Denuncia
 #from .models import Cidadao, UsrTree, Atividade_cidadao
 #from .models import Cidadao, MyModel, UsrTree
 #por que MyModel?
@@ -108,12 +108,15 @@ def cadastro(request):
     esquema = FormCadastrar().bind(request=request)
     esquema.title = "Cadastrar novo usuário"
     form = deform.Form(esquema, buttons=('Cadastrar',))
+	
     if 'Cadastrar' in request.POST:
         # Validação do formulário
         try:
             form.validate(request.POST.items())
         except deform.ValidationFailure as e:
             return {'form': e.render()}
+		#deslogando usuário, caso haja algum	
+        headers = forget(request)	
 			
 		# Criação e inserção	
         cidadao = Cidadao("","")
@@ -129,7 +132,7 @@ def cadastro(request):
         transaction.commit()
         request.session.flash(u"Usuário registrado com sucesso.")
         request.session.flash(u"Agora você já pode logar com ele.")
-        return HTTPFound(location=request.route_url('lista'))
+        return HTTPFound(location=request.route_url('inicial'), headers = headers)
     else:
         # Apresentação do formulário
         return {'form': form.render()}
@@ -569,7 +572,7 @@ def orcamento(request):
             esquema = FormOrcamento().bind(request=request)
             form = deform.Form(esquema, buttons=('Enviar',))
             form.render()			
-            appstruct = form.validate(request.POST.items())
+            form.validate(request.POST.items())
         except deform.ValidationFailure as e:
             print "form de comentário deu erro"			
             return {'form': e.render()}				
@@ -646,7 +649,7 @@ def orcamento(request):
             'formSeguir': formSeguir.render(appstruct=appstruct),				
         }
 	
-@view_config(route_name='inserir_ponto', renderer='inserir_ponto.slim')
+@view_config(route_name='inserir_ponto', renderer='inserir_ponto.slim', permission='basica')
 def inserir_ponto(request):
     """ 
     Página para inserir novos pontos/atividades no mapa pelo usuário
@@ -666,7 +669,7 @@ def inserir_ponto(request):
 
         if(authenticated_userid(request)):	
 		    # Criação e inserção	
-            atividade = Atividade_cidadao("","")
+            atividade = Atividade_cidadao()
             atividade = merge_session_with_post(atividade, request.POST.items())
 		    #inserir id para a atividade?
             atividade.data = datetime.now()
@@ -769,20 +772,28 @@ def denunciar(request):
     """
     esquema = FormDenuncia().bind(request=request)
     esquema.title = "Denunciar mídia"
+	
+    midia = Midia("", "") 
+	#selecionar de algum jeito essa mídia vinda de um link
     
     form = deform.Form(esquema, buttons=('Enviar',))
     if 'Enviar' in request.POST:
         # Validação do formulário
         try:
             esquema = FormDenuncia().bind(request=request)
+            esquema.title = "Denunciar mídia"
             form = deform.Form(esquema, buttons=('Enviar',))	
             form.render()	
 
             form.validate(request.POST.items())
         except deform.ValidationFailure as e:
             return {'form': e.render()}
+		
+        denuncia = Denuncia(request.POST.get("motivo"), authenticated_userid(request))		
+        midia.addDenuncia(denuncia)	
+        transaction.commit()		
 					
-        return HTTPFound(location=request.route_url('rcad_senha'))
+        return HTTPFound(location=request.route_url('orcamento'))
     else:
         return {'form': form.render()}		
 		
