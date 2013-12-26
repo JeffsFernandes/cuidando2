@@ -45,6 +45,7 @@ from forms import (
     FormOrcFoto,
     FormOrcVideo,
     FormSeguirAtv,
+    FormDenuncia,
 )
 import deform
 import transaction
@@ -507,7 +508,7 @@ def orcamento(request):
     formResp = deform.Form(esquemaResp, buttons=('Responder',))	
 	
     #atv_orc = Atividade_orcamento("","")
-    atv_orc = Atividade_cidadao("","")
+    atv_orc = Atividade_cidadao()
     #modificar o orçamento a ser exibido na página	
     atv_orc = request.db["atvTree"]["testeC8"]		
 	#atividade vinda do mapa
@@ -756,3 +757,32 @@ def r_senha(request):
         return HTTPFound(location=request.route_url('rcad_senha'))
     else:
         return {'form': form.render()}		
+
+@view_config(
+    route_name='denuncia',
+    renderer='denuncia.slim',
+    permission='basica'
+)
+def denunciar(request):
+    """ 
+    Formulário para enviar denúncia de mídia
+    """
+    esquema = FormDenuncia().bind(request=request)
+    esquema.title = "Denunciar mídia"
+    
+    form = deform.Form(esquema, buttons=('Enviar',))
+    if 'Enviar' in request.POST:
+        # Validação do formulário
+        try:
+            esquema = FormDenuncia().bind(request=request)
+            form = deform.Form(esquema, buttons=('Enviar',))	
+            form.render()	
+
+            form.validate(request.POST.items())
+        except deform.ValidationFailure as e:
+            return {'form': e.render()}
+					
+        return HTTPFound(location=request.route_url('rcad_senha'))
+    else:
+        return {'form': form.render()}		
+		

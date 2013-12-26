@@ -456,3 +456,16 @@ class FormRSenha(CSRFSchema):
         validator=Email('E-mail inválido'),
         description='Digite seu e-mail'
     )	
+
+class FormDenuncia(CSRFSchema):
+    """ 
+    Formulário para enviar denúncia de mídias
+    """
+    motivo = SchemaNode(
+        String(),
+        missing=unicode(''),		
+        description='Qual o motivo da denúncia?',
+        title='Motivo',
+        validator=Length(max=200),
+        widget=widget.TextAreaWidget(rows=10, cols=60)	
+    )	

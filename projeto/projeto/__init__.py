@@ -12,6 +12,8 @@ from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 import pydoc
 from security import groupfinder
+import venusian
+import webob
 
 
 def main(global_config, **settings):
@@ -80,6 +82,7 @@ def main(global_config, **settings):
     config.add_route('loginTwitterAuth', '/loginTwitterAuth')	
     config.add_route('loginFacebook', '/loginFacebook')		
     config.add_route('authFacebook', '/authFacebook')		
-    config.add_route('loginAuthFace', '/loginAuthFace')		
+    config.add_route('loginAuthFace', '/loginAuthFace')	
+    config.add_route('denuncia', '/denunciar')			
     config.scan()
     return config.make_wsgi_app()

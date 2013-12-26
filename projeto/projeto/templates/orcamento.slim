@@ -4,6 +4,7 @@
 
 -block conteudo
   h3 Descrição do orçamento
+  
   p = orcamento.atividade
   p = orcamento.endereco  
   p = orcamento.descricao
@@ -45,6 +46,11 @@
 	  
     /compartilhar	  
     <div class="fb-share-button" data-href="${videos[i].link}" data-type="button_count"></div>	
+ 
+    br  
+    /denunciar
+    a href="${request.route_url('denuncia')}" Denunciar este vídeo	
+	
     br 
     br
 	
@@ -76,6 +82,9 @@
 	  
     /compartilhar	  
     <div class="fb-share-button" data-href="${request.route_url('orcamento')}" data-type="button_count"></div>		
+	
+    /denunciar
+    a href="${request.route_url('denuncia')}" Denunciar este comentário	
 	
     -python	
       j = 0
