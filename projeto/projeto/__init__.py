@@ -71,6 +71,7 @@ def main(global_config, **settings):
     config.add_route('usuario', '/usuario')
     config.add_route('mapa', '/mapa')
     config.add_route('orcamento', '/orcamento')	
+    config.add_route('orcamentoId', '/orcamento/{id}')	
     config.add_route('inserir_ponto', '/inserir_ponto')	
     config.add_route('privacidade', '/privacidade')	
     config.add_route('termos', '/termos')	

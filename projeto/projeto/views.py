@@ -485,11 +485,14 @@ def mapa(request):
             'showmenu':True,
             }
 
-@view_config(route_name='orcamento', renderer='orcamento.slim')
+@view_config(route_name='orcamentoId', renderer='orcamento.slim')
 def orcamento(request):
     """
     Página de um orçamento individual
     """	
+    id = ""
+    id = request.matchdict['id']	
+
     esquemaFoto = FormOrcFoto().bind(request=request)
     esquemaFoto.title = "Foto"
     formFoto = deform.Form(esquemaFoto, buttons=('Upload Foto',))	
@@ -507,13 +510,13 @@ def orcamento(request):
     form = deform.Form(esquema, buttons=('Enviar',))	
 	
     esquemaResp = FormOrcamento().bind(request=request)
-    #esquema.title = "Comentários"
+    #esquema.title = "Resposta"
     formResp = deform.Form(esquemaResp, buttons=('Responder',))	
 	
     #atv_orc = Atividade_orcamento("","")
     atv_orc = Atividade_cidadao()
     #modificar o orçamento a ser exibido na página	
-    atv_orc = request.db["atvTree"]["testeC8"]		
+    atv_orc = request.db["atvTree"][int(id)]	
 	#atividade vinda do mapa
     #atv_orc = request.db["orcTree"]
 	#atv_orc = request.db["atvTree"]
@@ -523,6 +526,8 @@ def orcamento(request):
     i = 0
     formsResps = []	
 
+	#criar forulários de respostas ao conetários já existentes
+	#cada form tem um id, para identificarmos qual é o comentário e sua resposta respectiva
     for coment in atv_orc.midia_coment:
         formResp = deform.Form(esquemaResp, buttons=('Responder',), formid=str(i))
         formsResps.append(formResp.render())		
@@ -646,7 +651,8 @@ def orcamento(request):
             'formVideo': formVideo.render(),
             'videos': atv_orc.midia_video,			
             'formFoto': formFoto.render(),
-            'formSeguir': formSeguir.render(appstruct=appstruct),				
+            'formSeguir': formSeguir.render(appstruct=appstruct),		
+			#enviar o midia_foto assim que estiverem cadastradas no banco
         }
 	
 @view_config(route_name='inserir_ponto', renderer='inserir_ponto.slim', permission='basica')
@@ -658,6 +664,7 @@ def inserir_ponto(request):
     esquema.title = "Inserir ponto no mapa"
     form = deform.Form(esquema, buttons=('Inserir', 'Cancelar'))
 	
+	#não se se isto fica aqui ou no models
     if not request.db.has_key("atvTree"):
         request.db["atvTree"] = OOBTree()
 		
@@ -666,24 +673,27 @@ def inserir_ponto(request):
             form.validate(request.POST.items())
         except deform.ValidationFailure as e:
             return {'form': e.render()}
-
+		
         if(authenticated_userid(request)):	
+            dadosSite = request.db['dadosSite']
+			
 		    # Criação e inserção	
             atividade = Atividade_cidadao()
             atividade = merge_session_with_post(atividade, request.POST.items())
 		    #inserir id para a atividade?
             atividade.data = datetime.now()
             atividade.cidadao = authenticated_userid(request)
-            request.db['atvTree'][atividade.atividade] = atividade
-			
-            dadosSite = request.db['dadosSite']
+            atividade.id = dadosSite.proxId
+            request.db['atvTree'][atividade.id] = atividade
+
+            dadosSite.proxId = dadosSite.proxId + 1        
             #chama função para inserir na lista de atualizações		
             Dados_site.addAtual(dadosSite, atividade)
             Dados_site.addAtvUsr(dadosSite)
             transaction.commit()
             request.session.flash(u"Atividade de usuário cadastrada com sucesso.")
 		#retorno -> levar atividade inserida
-        return HTTPFound(location=request.route_url('orcamento'))
+        return HTTPFound(location=request.route_url('orcamentoId', id = atividade.id))
     else:
         return {'form': form.render()}
 
@@ -791,6 +801,9 @@ def denunciar(request):
 		
         denuncia = Denuncia(request.POST.get("motivo"), authenticated_userid(request))		
         midia.addDenuncia(denuncia)	
+		
+		#chamar delMidiaDen da atividade relacionada
+		
         transaction.commit()		
 					
         return HTTPFound(location=request.route_url('orcamento'))

@@ -127,6 +127,7 @@ class Atividade(Persistent):
 		#usar algum número aleatório como id? Acho melhor do que usar o nome da atividade....
         self.atividade = ""
         self.descricao = ""
+        self.id = 0		
 		
         self.midia_video = []	   
         self.midia_foto = []	
@@ -140,7 +141,27 @@ class Atividade(Persistent):
     def addVideo(self,Video):
 		#adiciona videos   
         self.midia_video.append(Video)
-        self._p_changed = 1			
+        self._p_changed = 1	
+
+    #método que irá varrer as mídias à procura de alguma marcada para exclusão		
+    def delMidiaDen(self):
+        i = 0	
+        for x in self.midia_video:
+            if x.excluir == True:	
+                del self.midia_video[i]			
+            i = i +1	
+			
+        i = 0	
+        for x in self.midia_foto:
+            if x.excluir == True:	
+                del self.midia_foto[i]			
+            i = i +1
+			
+        i = 0	
+        for x in self.midia_coment:
+            if x.excluir == True:	
+                del self.midia_coment[i]			
+            i = i +1
 		
 #persistent ou persistent mapping??
 
@@ -191,12 +212,18 @@ class Midia(Persistent):
 
         self.data = data
         self.cidadao = cidadao 
+		#é marcado no método addDenuncia, caso ultrapasse o número parametrizado
+        self.excluir = False
 		
         self.denuncias = []		
 
     def addDenuncia(self,Denuncia):
 		#adiciona comentario   
         self.denuncias.append(Denuncia)
+		#número fixo de denúncias = 10
+        if(	len(self.denuncias) > 10):
+            self.excluir = True
+		
         self._p_changed = 1			
 
 class Midia_foto(Midia):
@@ -281,6 +308,7 @@ class Dados_site(PersistentMapping):
         self.qtde_fotos = 0
         self.qtde_videos = 0
         self.qtde_coment = 0
+        self.proxId = 0
 
 	#está inserindo o objeto todo da atividade, não sei se é melhor só guardar o nome...
 	# mas aí o interessante é redirecionar o objeto para o link a ser aberto....

@@ -389,10 +389,6 @@ class FormInserirP(CSRFSchema):
     """
     atividade = SchemaNode(
         String(),
-        validator=All(
-            Length(max=32),
-            Regex("^(\w)*$", "Usar apenas letras, números ou _"),
-        ),
         title='Título',		
         description='Nome do local')
     endereco = SchemaNode(

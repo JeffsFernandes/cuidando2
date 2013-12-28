@@ -10,7 +10,7 @@
   h3 Atualizações
   -if atualAtv
     -for atv in atualAtv
-      a href="${request.route_url('orcamento')}" ${atv.atividade}
+      a href="${request.route_url('orcamentoId',id=atv.id )}" ${atv.atividade}
       br
 
   h3 Tópicos em destaque
