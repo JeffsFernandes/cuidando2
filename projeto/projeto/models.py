@@ -104,6 +104,11 @@ class Cidadao(PersistentMapping):
         self.pontos_inseridos.append(Atividade.atividade)
 		# inserir só o nome da atividade?.....
         self._p_changed = 1			
+
+    def addDenuncia(self,Denuncia):
+		#adiciona comentario   
+        self.denuncias.append(Denuncia)	
+        self._p_changed = 1			
         		   		
 #é necessário?? os usuários já teem as listas: pontos_inseridos e pontos_a_seguir
 class Notificacao(Persistent):
@@ -132,7 +137,7 @@ class Atividade(Persistent):
         self.midia_video = []	   
         self.midia_foto = []	
         self.midia_coment = []	
-
+	
     def addComent(self,Coment):
 		#adiciona comentario   
         self.midia_coment.append(Coment)
@@ -177,7 +182,8 @@ class Atividade_cidadao(Atividade):
         self.cidadao = ""	
         self.data = ""
         self.tipo = ""
-
+		
+        self.denuncias = []	
 		#auxiliar para saber indice do comentário pai....
         self.aux =0
 			
@@ -255,7 +261,7 @@ class Midia_video(Midia):
     ):
 	    #data e cidadao?
         Midia.__init__(self, data, cidadao)
-        self.linkOrig = link 
+        self.linkOrig = linkOrig 
         self.link = ""		
      
 

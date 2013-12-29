@@ -345,6 +345,19 @@ class FormOrcamento(CSRFSchema):
         widget=widget.TextAreaWidget(rows=3, cols=60),
     )	
 	
+class FormOrcamentoResp(CSRFSchema):
+    """
+    Formulário para inserção de comentários no orçamento
+    """
+    resposta = SchemaNode(
+        String(),
+        missing=unicode(''),		
+        description='Responda a este comentáro',
+        title='Responda',
+        validator=Length(max=100),
+        widget=widget.TextAreaWidget(rows=3, cols=60),
+    )		
+	
 class FormOrcFoto(CSRFSchema):
     """
     Formulário para upload de fotos para o orçamento

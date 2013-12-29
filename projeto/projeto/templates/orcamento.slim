@@ -19,6 +19,8 @@
   <div class="fb-share-button" data-href="${request.route_url('orcamento')}" data-type="button_count"></div>  
   
   br
+  /denunciar a atividade
+  /a href="${request.route_url('denuncia')}" Denunciar atividade	  
   
   -if formFoto
     =formFoto|n
@@ -46,10 +48,10 @@
 	  
     /compartilhar	  
     <div class="fb-share-button" data-href="${videos[i].link}" data-type="button_count"></div>	
- 
+
     br  
     /denunciar
-    a href="${request.route_url('denuncia')}" Denunciar este vídeo	
+    a href="${request.route_url('denuncia', id=orcamento.id, tmidia='video', idM=i)}" Denunciar este vídeo	
 	
     br 
     br
@@ -84,7 +86,7 @@
     <div class="fb-share-button" data-href="${request.route_url('orcamento')}" data-type="button_count"></div>		
 	
     /denunciar
-    a href="${request.route_url('denuncia')}" Denunciar este comentário	
+    a href="${request.route_url('denuncia', id = orcamento.id, tmidia='comentario', idM=i)}" Denunciar este comentário	
 	
     -python	
       j = 0

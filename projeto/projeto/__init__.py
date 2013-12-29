@@ -12,6 +12,7 @@ from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 import pydoc
 from security import groupfinder
+#bibliotecas para a extração da docummentação
 import venusian
 import webob
 
@@ -84,6 +85,6 @@ def main(global_config, **settings):
     config.add_route('loginFacebook', '/loginFacebook')		
     config.add_route('authFacebook', '/authFacebook')		
     config.add_route('loginAuthFace', '/loginAuthFace')	
-    config.add_route('denuncia', '/denunciar')			
+    config.add_route('denuncia', '/orcamento/{id}/{tmidia}/{idM}')			
     config.scan()
     return config.make_wsgi_app()

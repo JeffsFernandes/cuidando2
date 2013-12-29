@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pyramid.view import view_config
-from .models import Cidadao, Atividade_cidadao, Atividade_orcamento, Dados_site, Midia, Midia_comentario, Midia_video, Denuncia
+from .models import Cidadao,Atividade, Atividade_cidadao, Atividade_orcamento, Dados_site, Midia, Midia_comentario, Midia_video, Denuncia
 #from .models import Cidadao, UsrTree, Atividade_cidadao
 #from .models import Cidadao, MyModel, UsrTree
 #por que MyModel?
@@ -39,6 +39,7 @@ from forms import (
     FormMapa,
     FormInserirP,
     FormOrcamento,
+    FormOrcamentoResp,
     FormRecadSenha,	
     FormRSenha,
     FormPesqMapa,
@@ -46,6 +47,7 @@ from forms import (
     FormOrcVideo,
     FormSeguirAtv,
     FormDenuncia,
+	
 )
 import deform
 import transaction
@@ -490,8 +492,7 @@ def orcamento(request):
     """
     Página de um orçamento individual
     """	
-    id = ""
-    id = request.matchdict['id']	
+    id = int(request.matchdict['id'])	
 
     esquemaFoto = FormOrcFoto().bind(request=request)
     esquemaFoto.title = "Foto"
@@ -509,14 +510,14 @@ def orcamento(request):
     #esquema.title = "Comentários"
     form = deform.Form(esquema, buttons=('Enviar',))	
 	
-    esquemaResp = FormOrcamento().bind(request=request)
+    esquemaResp = FormOrcamentoResp().bind(request=request)
     #esquema.title = "Resposta"
     formResp = deform.Form(esquemaResp, buttons=('Responder',))	
 	
     #atv_orc = Atividade_orcamento("","")
-    atv_orc = Atividade_cidadao()
+    atv_orc = Atividade()
     #modificar o orçamento a ser exibido na página	
-    atv_orc = request.db["atvTree"][int(id)]	
+    atv_orc = request.db["atvTree"][id]	
 	#atividade vinda do mapa
     #atv_orc = request.db["orcTree"]
 	#atv_orc = request.db["atvTree"]
@@ -532,14 +533,20 @@ def orcamento(request):
         formResp = deform.Form(esquemaResp, buttons=('Responder',), formid=str(i))
         formsResps.append(formResp.render())		
         i = i + 1		 
-	
-    cidadao = Cidadao("","")
-    cidadao = request.db["usrTree"][authenticated_userid(request)]		
+		
+    cidadao = Cidadao("","")	
+    if (authenticated_userid(request)):
+        cidadao = request.db["usrTree"][authenticated_userid(request)]		
 	
     if 'Upload_Foto' in request.POST:
+        if (not authenticated_userid(request)):
+            request.session.flash(u"Você deve estar logado para inserir conteúdos no site")				
+            return HTTPFound(location=request.route_url('login'))		
+	
         try:
             formFoto.validate(request.POST.items())
         except deform.ValidationFailure as e:
+		
             return {'form': e.render()}
 			
 		#3 linhas abaixo se repetindo para os 3 forms.... como otimizar??
@@ -548,8 +555,12 @@ def orcamento(request):
         Dados_site.addAtual(dadosSite, atv_orc) 
         Dados_site.addFoto(dadosSite)
         transaction.commit() 		
-        return HTTPFound(location=request.route_url('orcamento'))	
+        return HTTPFound(location=request.route_url('orcamentoId', id=id))	
     elif 'Upload_Video' in request.POST:
+        if (not authenticated_userid(request)):
+            request.session.flash(u"Você deve estar logado para inserir conteúdos no site")				
+            return HTTPFound(location=request.route_url('login'))		
+	
         try:
             formVideo.validate(request.POST.items())
         except deform.ValidationFailure as e:
@@ -571,8 +582,13 @@ def orcamento(request):
         Atividade_cidadao.addVideo(atv_orc, video)		
         transaction.commit()				
 		
-        return HTTPFound(location=request.route_url('orcamento'))		
+        return HTTPFound(location=request.route_url('orcamentoId', id=id))		
+
     elif 'Enviar' in request.POST:
+        if (not authenticated_userid(request)):
+            request.session.flash(u"Você deve estar logado para inserir conteúdos no site")		
+            return HTTPFound(location=request.route_url('login'))		
+	
         try:
             esquema = FormOrcamento().bind(request=request)
             form = deform.Form(esquema, buttons=('Enviar',))
@@ -583,27 +599,34 @@ def orcamento(request):
             return {'form': e.render()}				
 		#3 linhas abaixo se repetindo para os 3 forms.... como otimizar??
 		
+	
+		
         dadosSite = request.db['dadosSite']
         #chama função para inserir na lista de atualizações		
         Dados_site.addAtual(dadosSite, atv_orc)
         Dados_site.addComent(dadosSite)	
 
         coment = Midia_comentario(request.POST.get('comentario'), datetime.now(), authenticated_userid(request))
-        transaction.commit()		
-		#verificar como vai ficar com a atividade orçamentária
 
         Atividade_cidadao.addComent(atv_orc, coment)	
         transaction.commit()	
-        return HTTPFound(location=request.route_url('orcamento'))	
+        return HTTPFound(location=request.route_url('orcamentoId', id=id))	
+
     elif 'Responder' in request.POST:
+	
+        if (not authenticated_userid(request)):
+            request.session.flash(u"Você deve estar logado para inserir conteúdos no site")				
+            return HTTPFound(location=request.route_url('login'))		
+	
         try:
-            esquemaResp = FormOrcamento().bind(request=request)
+            esquemaResp = FormOrcamentoResp().bind(request=request)
             formResp = deform.Form(esquemaResp, buttons=('Responder',))	
             formResp.render()	
 
             formResp.validate(request.POST.items())
         except deform.ValidationFailure as e:			
             return {'form': e.render()}			
+		
 		#pega o id do form que enviou a resposta do comentário
         posted_formid = int(request.POST['__formid__'])		
         		
@@ -613,7 +636,7 @@ def orcamento(request):
         Dados_site.addAtual(dadosSite, atv_orc)
         Dados_site.addComent(dadosSite)	
 
-        coment = Midia_comentario(request.POST.get('comentario'), datetime.now(), authenticated_userid(request))
+        coment = Midia_comentario(request.POST.get('resposta'), datetime.now(), authenticated_userid(request))
         transaction.commit()		
 
 		#adiciona a resposta ao comentário pai, conforme o id do form de resposta
@@ -622,17 +645,21 @@ def orcamento(request):
         comentPai._p_changed = 1	
 		
         transaction.commit()	
-        return HTTPFound(location=request.route_url('orcamento'))			
+        return HTTPFound(location=request.route_url('orcamentoId', id=id))			
     elif 'Salvar' in request.POST:
+        if (not authenticated_userid(request)):
+            request.session.flash(u"Você deve estar logado para inserir conteúdos no site")				
+            return HTTPFound(location=request.route_url('login'))		
+	
         try:
             formSeguir.validate(request.POST.items())
         except deform.ValidationFailure as e:
             return {'form': e.render()}	
-						
+        
         Cidadao.addSeguir(cidadao, atv_orc, request.POST.get('seguir'))	
         transaction.commit()
 
-        return HTTPFound(location=request.route_url('orcamento'))		
+        return HTTPFound(location=request.route_url('orcamentoId', id=id))		
     else: 
         seguirAtv = cidadao.pontos_a_seguir	
         #verifica se o usuário logado está seguindo a atividade    	    
@@ -780,10 +807,24 @@ def denunciar(request):
     """ 
     Formulário para enviar denúncia de mídia
     """
+    id = int(request.matchdict['id'])
+    tipoMidia = request.matchdict['tmidia']
+    idMidia = int(request.matchdict['idM'])
+	
+    atividade = Atividade()
+    atividade = request.db["atvTree"][id]
+
+    if tipoMidia == 'foto':
+        midia = atividade.midia_foto[idMidia]	
+    elif tipoMidia == 'video':	
+        midia = atividade.midia_video[idMidia]		
+    elif tipoMidia == 'comentario':	
+        midia = atividade.midia_coment[idMidia]		
+	
     esquema = FormDenuncia().bind(request=request)
     esquema.title = "Denunciar mídia"
 	
-    midia = Midia("", "") 
+    #midia = Midia("", "") 
 	#selecionar de algum jeito essa mídia vinda de um link
     
     form = deform.Form(esquema, buttons=('Enviar',))
@@ -801,12 +842,14 @@ def denunciar(request):
 		
         denuncia = Denuncia(request.POST.get("motivo"), authenticated_userid(request))		
         midia.addDenuncia(denuncia)	
+        atividade.delMidiaDen()
 		
-		#chamar delMidiaDen da atividade relacionada
+        cidadao = request.db["usrTree"][authenticated_userid(request)]		
+        cidadao.addDenuncia(denuncia)	
 		
         transaction.commit()		
 					
-        return HTTPFound(location=request.route_url('orcamento'))
+        return HTTPFound(location=request.route_url('orcamentoId', id=id))
     else:
         return {'form': form.render()}		
 		
