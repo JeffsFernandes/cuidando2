@@ -11,7 +11,6 @@
 	<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
 	<script src="jquery-1.10.2.min.js"></script>
 	<script src="jquery.csv-0.71.min.js"></script>
-	<script src="saida.js"></script>
 	<link rel="stylesheet" href="MarkerCluster.css" />
 	<link rel="stylesheet" href="MarkerCluster.Default.css" />
 	<script src="leaflet.markercluster-src.js"></script>
@@ -21,223 +20,63 @@
 	<div id="map" style="width: 1024px; height: 768px"></div>
 
 	<script>
-		$.get("teste.csv", function(data){
-			console.log(data);
-			var teste = $.csv.toArrays(data);
-			console.log(teste);
-		});
-
-		var cities = new L.LayerGroup();
-
-	    L.marker([39.61, -105.02]).bindPopup('This is Littleton, CO.').addTo(cities),
-		L.marker([39.74, -104.99]).bindPopup('This is Denver, CO.').addTo(cities),
-		L.marker([39.73, -104.8]).bindPopup('This is Aurora, CO.').addTo(cities),
-		L.marker([39.77, -105.23]).bindPopup('This is Golden, CO.').addTo(cities);
-
-
-	    var cmAttr = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-			cmUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/{styleId}/256/{z}/{x}/{y}.png';
-
-	    var minimal   = L.tileLayer(cmUrl, {styleId: 22677, attribution: cmAttr}),
-		    midnight  = L.tileLayer(cmUrl, {styleId: 999,   attribution: cmAttr}),
-		    motorways = L.tileLayer(cmUrl, {styleId: 46561, attribution: cmAttr});
-
-		// Tentativa de usar a base de dados (saida.js) simplesmente para exemplificar o que queremos com as creches.
-
-		/*for(var i = 0; i < addressPoints.length; i++){
-			for(var j = i+1; j < addressPoints.length; j++){
-				var a = addressPoints[i];
-				var aux = addressPoints[j];
-				var filtro = a[3];
-				var auxFiltro = aux[3];
-				if(filtro == auxFiltro){
-					aux[3] = "";
+		$.get("teste.csv", function(data){ // Função em JQUERY para acessar um arquivo no servidor.
+				var teste = $.csv.toArrays(data); // Função da biblioteca para converter o csv em um array.
+				console.log(teste); // Debug
+				var publica = new L.LayerGroup(); // Criando LayerGroup para creches publicas
+				var privada = new L.LayerGroup(); // Criando LayerGroup para creches particulares
+				// Criando ícones customizados
+				var redIcon = L.Icon.Default.extend({
+	            options: {
+	            	    iconUrl: 'img/carrinho-azul.png' 
+	            	}
+		        });
+	        	var greenIcon = L.Icon.Default.extend({
+	            options: {
+	            	    iconUrl: 'img/carrinho-verde.png' 
+	            	}
+		        });
+	        	var orangeIcon = L.Icon.Default.extend({
+	            options: {
+	            	    iconUrl: 'img/carrinho-laranja.png' 
+	            	}
+	    	    });
+	        	var redIcon = new redIcon();
+	        	var greenIcon = new greenIcon();
+	        	var orangeIcon = new orangeIcon();
+	        	// Percorrendo o array que contém os dados do CSV
+				for(var i=1; i<teste.length-1; i++){
+					var a = teste[i];
+					console.log(a[1]);
+					if(a[1] == 'PUBLICA' || a[1] == 'Publica'){ // Filtro para separar as creches
+						L.marker([a[4],a[3]],{icon: redIcon}).bindPopup(a[0]+"<br>"+"Distrito: "+a[2]).addTo(publica); // Jogando no mapa
+					}else{
+						L.marker([a[4],a[3]],{icon: greenIcon}).bindPopup(a[0]).addTo(privada); // Jogando no mapa
+					}
 				}
-			}
-		}*/
-		var saude = new L.LayerGroup();/*
-		var administracao = new L.LayerGroup();
-		var agricultura = new L.LayerGroup();
-		var assistencia_social = new L.LayerGroup();
-		var comunicacoes = new L.LayerGroup();
-		var comercio_servicos = new L.LayerGroup();*/
-		var cultura = new L.LayerGroup();/*
-		var defesa_nacional = new L.LayerGroup();
-		var desporto_lazer = new L.LayerGroup();
-		var direitos_cidadania = new L.LayerGroup();*/
-		var educacao = new L.LayerGroup(); /*
-		var encargos_especiais = new L.LayerGroup();
-		var energia = new L.LayerGroup();
-		var gestao_ambiental = new L.LayerGroup();
-		var habitacao = new L.LayerGroup(); 
-		var judiciaria = new L.LayerGroup(); 
-		var legislativa = new L.LayerGroup();
-		var previdencia_social = new L.LayerGroup();
-		var relacoes_exteriores = new L.LayerGroup();
-		var reserva_contigencia = new L.LayerGroup(); 
-		var saneamento = new L.LayerGroup();
-		var seguranca_publica = new L.LayerGroup();
-		var trabalho = new L.LayerGroup();
-		var transporte = new L.LayerGroup();
-		var urbanismo = new L.LayerGroup();*/
+				var cmAttr = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+					cmUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/{styleId}/256/{z}/{x}/{y}.png';
 
-		/*
-		var greenIcon = L.icon({
-		    iconUrl: 'leaf-green.png',
-		    shadowUrl: 'leaf-shadow.png',
+				var minimal   = L.tileLayer(cmUrl, {styleId: 22677, attribution: cmAttr});
+				// Criando o mapa
+				var map = L.map('map', {
+				center: [-23.5335074, -46.5666354],
+				zoom: 10,
+				layers: [minimal, publica, privada] 
+				});
+			//Layers
+			var baseLayers = {
+				"Minimal": minimal,
+			};
+			//Overlays
+			var overlays = {
+				"Públicas": publica,
+				"Privadas": privada
+			};
 
-		    iconSize:     [38, 95], // size of the icon
-		    shadowSize:   [50, 64], // size of the shadow
-		    iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-		    shadowAnchor: [4, 62],  // the same for the shadow
-		    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-		});
-
-		var LeafIcon = L.Icon.extend({
-		    options: {
-		        shadowUrl: 'leaf-shadow.png',
-		        iconSize:     [38, 95],
-		        shadowSize:   [50, 64],
-		        iconAnchor:   [22, 94],
-		        shadowAnchor: [4, 62],
-		        popupAnchor:  [-3, -76]
-		    }
-		});
-		var greenIcon = new LeafIcon({iconUrl: 'leaf-green.png'}),
-		    redIcon = new LeafIcon({iconUrl: 'leaf-red.png'}),
-		    orangeIcon = new LeafIcon({iconUrl: 'leaf-orange.png'});
-		*/
-		var redIcon = L.Icon.Default.extend({
-            options: {
-            	    iconUrl: 'img/carrinho-azul.png' 
-            }
+			L.control.layers(baseLayers, overlays).addTo(map);
         });
-        var greenIcon = L.Icon.Default.extend({
-            options: {
-            	    iconUrl: 'img/carrinho-verde.png' 
-            }
-        });
-        var orangeIcon = L.Icon.Default.extend({
-            options: {
-            	    iconUrl: 'img/carrinho-laranja.png' 
-            }
-        });
-         var redIcon = new redIcon();
-         var greenIcon = new greenIcon();
-         var orangeIcon = new orangeIcon();
-
-		for(var i = 0; i < addressPoints.length; i++){
-			var a = addressPoints[i];
-			var filtro = a[3];/*
-			if (filtro == 'Administração'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(administracao);
-			}
-			if (filtro == 'Agricultura'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(agricultura);
-			}
-			if (filtro == 'Assistência Social'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(assistencia_social);
-			}
-			if (filtro == 'Comunicações'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(comunicacoes);
-			}
-			if (filtro == 'Comércio e Serviços'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(comercio_servicos);
-			}*/
-			if (filtro == 'Cultura'){
-				L.marker([a[0],a[1]],{icon:greenIcon}).bindPopup(a[2]).addTo(cultura);
-			}/*
-			if (filtro == 'Defesa Nacional'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(defesa_nacional);
-			}*/
-			/*if (filtro == 'Desporto e Lazer'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(desporto_lazer);
-			}
-			if (filtro == 'Direitos da Cidadania'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(direitos_cidadania);
-			}*/
-			if (filtro == 'Educação'){
-				L.marker([a[0],a[1]],{icon:redIcon}).bindPopup(a[2]).addTo(educacao);
-			}/*
-			if (filtro == 'Encargos Especiais'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(encargos_especiais);
-			}
-			if (filtro == 'Energia'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(energia);
-			}
-			if (filtro == 'Gestão Ambiental'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(gestao_ambiental);
-			}
-			if (filtro == 'Habitação'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(habitacao);
-			}
-			if (filtro == 'Judiciária'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(judiciaria);	
-			}
-			if (filtro == 'Legislativa'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(legislativa);
-			}
-			if (filtro == 'Previdência Social'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(previdencia_social);
-			}
-			if (filtro == 'Relações Exteriores'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(relacoes_exteriores);
-			}
-			if (filtro == 'Reserva de Contigência'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(reserva_contigencia);
-			}
-			if (filtro == 'Saneamento'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(saneamento);
-			}*/
-			if (filtro == 'Saúde'){
-				L.marker([a[0],a[1]],{icon:orangeIcon}).bindPopup(a[2]).addTo(saude);
-			}/*
-			if (filtro == 'Segurança Pública'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(seguranca_publica);
-			}
-			if (filtro == 'Trabalho'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(trabalho);
-			}
-			if (filtro == 'Transporte'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(transporte);
-			}
-			if (filtro == 'Urbanismo'){
-				L.marker([a[0],a[1]]).bindPopup(a[2]).addTo(urbanismo);
-			}*/
-
-		}
-
-		var map = L.map('map', {
-			center: [-23.5335074, -46.5666354],
-			zoom: 10,
-			layers: [minimal, saude, cultura, educacao]
-		});
-
-		var baseLayers = {
-			"Minimal": minimal,
-			"Night View": midnight
-		};
-
-		var overlays = {
-			//"Motorways": motorways,
-			//"Cities": cities,
-			/*"Administração": administracao,
-			"Agricultura": agricultura,
-			"Assistência Social": assistencia_social,
-			"Comunicações": comunicacoes,
-			"Comércio e Serviços": comercio_servicos,*/
-			"Cultura": cultura,
-			/*"Defesa Nacional": defesa_nacional,
-			"Desporto e Lazer": desporto_lazer,
-			"Direitos da Cidadania": direitos_cidadania,
-			*/"Educação": educacao,/*
-			"Encargos Especiais": encargos_especiais,
-			"Energia": energia,
-			"Gestão Ambiental": gestao_ambiental,*/
-			"Saúde": saude
-		};
-
-		L.control.layers(baseLayers, overlays).addTo(map);
+        
 	</script>
 </body>
 </html>
