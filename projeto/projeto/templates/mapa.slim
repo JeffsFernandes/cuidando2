@@ -6,6 +6,22 @@
   -if formPesq
     =formPesq|n  
 	
+  <form class="form">
+    <input id="address" class="input-medium search-query" type="text" style="width: 400px;" placeholder="Coloque aqui um endereço para procurar no mapa">
+    <button id="btnSearch" class="btn btn-primary" type="button" value="Localizar" onclick="codeAddress()">Localizar</button>
+    /script não funciona - arquivo localizar.js
+      <script>
+        $("#address").keypress(function(event){
+          if(event.keyCode == 13){
+            event.preventDefault();
+            codeAddress();
+            return false;
+        }
+        });
+      </script>
+
+  </form>	
+	
   <section id="map">
     <div class="page-header" style>
       h2 Mapa
@@ -15,12 +31,74 @@
       <div id="map-wrapper"></div>
     </div>
   </section>		
+  
+  <section id="label">
+    <div class="page-header">
+      <h2>Legenda</h2>
+			  </div>
+			  <div class="row">
+			    <div style="width:397px; margin:0 auto;">
+			      <table id="label" cellspacing="0">
+							<tr>
+							  <th scope="col" class="nobg"></th>
+							  <th scope="col">Significado</th>
+							</tr>
+							<tr>
+							  <th scope="row" class="spec" style="text-align: center"><img src="${request.static_url('projeto:static/img/pin-red.png')}" width="22" height="32"></img></th>
+				  			<td>A despesa foi apenas <b>orçada</b>.</td>
+							</tr>
+							<tr>
+							  <th scope="row" class="specalt" style="text-align: center"><img src="${request.static_url('projeto:static/img/pin-yellow.png')}" width="22" height="32"></img></th>
+							  <td class="alt">A despesa teve alguma <b>atualização</b> no valor orçado.</td>
+							</tr>
+							<tr>
+							  <th scope="row" class="spec" style="text-align: center"><img src="${request.static_url('projeto:static/img/pin-green.png')}" width="22" height="32"></img></th>
+							  <td>Parte ou todo montante orçado foi <b>empenhado</b>.</td>
+							</tr>
+							<tr>
+							  <th scope="row" class="specalt" style="text-align: center"><img src="${request.static_url('projeto:static/img/pin-blue.png')}" width="22" height="32"></img></th>
+							  <td class="alt">Parte ou todo montante empenhado foi <b>liquidado</b>.</td>
+							</tr>
+							<caption>Legenda das cores dos marcadores utilizados</caption>
+			      </table>
+			    </div>
+			  </div>
+			</section>  
 	
   /exibição do mapa com link para inserir ponto
   -if form
     =form|n
 	
   h3 Gráficos
-  
-  h3 Tabelas
 
+			<section id="chart">
+			  <div class="page-header">
+			    <h2>Gráficos</h2>
+			  </div>
+			  <div class="row">
+			    <div id="chart-quantity-wrapper" class="span6"><center><img src="${request.static_url('projeto:static/img/loading.gif')}"></img></center></div>
+			    <div id="chart-values-wrapper" class="span6"><center><img src="${request.static_url('projeto:static/img/loading.gif')}"></img></center></div>
+			  </div>
+			</section>  
+  h3 Tabelas
+			<section id="mapped-list">
+  			<div class="page-header">
+			    <h2>Lista de atividades mapeadas</h2>
+			  </div>
+			  <div class="row">
+			    <div id="mapped-list-wrapper"><center><img src="${request.static_url('projeto:static/img/loading.gif')}"></img></center></div>
+			  </div>
+			</section>
+
+			<section id="notmapped-list">
+			  <div class="page-header">
+			    <h2>Lista de atividades não mapeadas</h2>
+			  </div>
+			  <div class="row">
+			    <div id="notmapped-list-wrapper"><center><img src="${request.static_url('projeto:static/img/loading.gif')}"></center></img></div>
+			  </div>
+			</section>
+			
+  <footer class="modal-footer">
+  </footer>
+			
