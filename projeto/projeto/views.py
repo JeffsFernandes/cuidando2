@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pyramid.view import view_config
-from .models import Cidadao,Atividade, Atividade_cidadao, Atividade_orcamento, Dados_site, Midia, Midia_comentario, Midia_video, Denuncia
+from .models import Cidadao, Cidadao_twitter,Atividade, Atividade_cidadao, Atividade_orcamento, Dados_site, Midia, Midia_comentario, Midia_video, Denuncia
 #from .models import Cidadao, UsrTree, Atividade_cidadao
 #from .models import Cidadao, MyModel, UsrTree
 #por que MyModel?
@@ -239,22 +239,48 @@ def logout(request):
 @view_config(route_name='loginTwitterAuth', renderer='loginTwitterAuth.slim',permission='comum')
 def loginTwitterAuth(request):	
     """		       
-    Loga usuário com conta do twitter já autorizada: chamado a partir do login
+    Loga usuário com conta do twitter já autorizada: chamado a partir do login = authTwitterAcc
     testando com twitter da zi	
     """	
     auth = tweepy.OAuthHandler("MBX41ZNwjzKMObK8AHHfQ", "56hnTS8qMDg623XAIw4vdYEGpZFJtzS82VrXhNrILQ") 	
-	
-    #auth.set_access_token(cidadao.twitter_key, cidadao.twitter_secret)	
 
-    #teste com twitter da zi	
-    auth.set_access_token("91435451-hhGY5e7Ga2c3viHCV26kVN1vgLWQm0gJMvJHYOsbh", "rEeRld6tM4V45T1fKX6abNc8BMC7hDF1n6q0tuOKfi2ME")		
-    twitterApi = tweepy.API(auth) 		
+    verifier = request.GET.get('oauth_verifier')	
+	
+    token = request.session.get('request_token')
+    #request.session.delete('request_token')
+    auth.set_request_token(token[0], token[1])		
+    print '=============='	
+    print token[0]	
+    #auth.set_access_token(cidadao.twitter_key, cidadao.twitter_secret)	
+    #teste com twitter da zi - acesso permanente à conta	
+    #auth.set_access_token("91435451-hhGY5e7Ga2c3viHCV26kVN1vgLWQm0gJMvJHYOsbh", "rEeRld6tM4V45T1fKX6abNc8BMC7hDF1n6q0tuOKfi2ME")
+		
+    auth.get_access_token(verifier)	
+    twitterApi = tweepy.API(auth) 	
 	
     if twitterApi:
-        userInfo = twitterApi.me()	
-        print userInfo.__getstate__()	
+        #cidadao = request.db["twtTree"][token[0]]	
+
+        userInfo = twitterApi.me()
+        print userInfo.screen_name	
+        cidadao = Cidadao_twitter()	 		
+        #cidadao = [] #[str(userInfo.screen_name)]		
+        if not userInfo.screen_name in request.db["twtTree"]:
+            #cidadao = Cidadao_twitter()		
+            cidadao.nomeUsr = userInfo.screen_name		
+            request.db['twtTree'][cidadao.nomeUsr] = cidadao
+		
+            dadosSite = request.db['dadosSite']
+            #chama função para atualizar contadores
+            Dados_site.addUsr(dadosSite)
+		
+            transaction.commit()
+            request.session.flash(u"Usuário registrado com sucesso.")
+            request.session.flash(u"Agora você já pode logar com ele.")	
+	
+        #print userInfo.__getstate__()	
         #print userInfo.email	
-        headers = remember(request, "teste@testecorp.com")			
+        headers = remember(request, userInfo.screen_name)			
         #headers = remember(request, "ilzi@testecorp.com")	
         request.session.flash(u"Logado com twitter")	   
         return HTTPFound(location=request.route_url('usuario'), headers=headers)	
@@ -310,7 +336,7 @@ def authTwitterAcc(request):
 	#autorização OAuth
     auth = tweepy.OAuthHandler("MBX41ZNwjzKMObK8AHHfQ", "56hnTS8qMDg623XAIw4vdYEGpZFJtzS82VrXhNrILQ", request.route_url('loginTwitterAuth')) 	
 	#token e secret da aplicação ->pegar no twitter
-    authUrl = auth.get_authorization_url()	
+    authUrl = auth.get_authorization_url(True)	
     request.session['request_token'] =  (auth.request_token.key, auth.request_token.secret)
     request.session.save() 
     try:
@@ -441,7 +467,10 @@ def usuario(request):
     """
 
     cidadao = Cidadao("","")
-    cidadao = request.db["usrTree"][authenticated_userid(request)]	
+    if not authenticated_userid(request) in request.db["usrTree"]:
+        cidadao = request.db["twtTree"][authenticated_userid(request)] 	
+	
+    #cidadao = request.db["usrTree"][authenticated_userid(request)]	
 
     return {
         'cidadao': cidadao

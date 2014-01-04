@@ -53,7 +53,7 @@ class Cidadao(PersistentMapping):
         self.senha = senha
         self.email = email
 		
-        self.id =""
+        self.apelido = ""
         self.nome_completo = ""
         self.genero = ""
         self.nascimento = ""
@@ -108,7 +108,19 @@ class Cidadao(PersistentMapping):
     def addDenuncia(self,Denuncia):
 		#adiciona comentario   
         self.denuncias.append(Denuncia)	
-        self._p_changed = 1			
+        self._p_changed = 1		
+
+class Cidadao_twitter(Cidadao):
+    """
+    Classe de cidadãos (usuários) cadastrados
+    """	
+    def __init__(
+        self,
+    ):   
+        Cidadao.__init__(self, "", "")	
+        self.nomeUsr = ""
+
+	
         		   		
 #é necessário?? os usuários já teem as listas: pontos_inseridos e pontos_a_seguir
 class Notificacao(Persistent):
@@ -374,10 +386,12 @@ def appmaker(zodb_root):
 	
     alterado = False
     if not 'usrTree' in zodb_root:
-		#teste
-        #zodb_root['usrTree'] = PersistentMapping()
         zodb_root['usrTree'] = OOBTree()
         alterado = True
+		
+    if not 'twtTree' in zodb_root:
+        zodb_root['twtTree'] = OOBTree()
+        alterado = True		
 
     if not "atualUsr" in zodb_root:
         zodb_root["atualUsr"] = PersistentMapping()		
