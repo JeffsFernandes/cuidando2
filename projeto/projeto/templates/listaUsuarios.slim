@@ -1,0 +1,10 @@
+-inherit base.slim
+
+-block conteudo
+
+  h1 Usuários
+  -for cidadao in cidadaos
+    h4 
+      a href="${request.route_url('perfilUsr',id=cidadao.email )}" ${cidadao.nome}		
+    p =cidadao.email
+    p =cidadao.cidade

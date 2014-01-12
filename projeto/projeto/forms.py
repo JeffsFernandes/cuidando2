@@ -364,9 +364,8 @@ class FormOrcFoto(CSRFSchema):
     """
 
     foto = SchemaNode(
-        deform.FileData(),
-        widget=widget.FileUploadWidget(tmpstore),
-        missing=unicode(''),		
+        String(),
+        missing=unicode(''),
         description='Carregar foto'
     )  	
 
@@ -418,12 +417,19 @@ class FormInserirP(CSRFSchema):
         widget=widget.SelectWidget(values=tipoLocal),
         title = "Gênero",		
     )
+    """	
     foto = SchemaNode(
         deform.FileData(),
         widget=widget.FileUploadWidget(tmpstore),
         missing=unicode(''),		
         description='Carregar foto'
     )  
+    """	
+    foto = SchemaNode(
+        String(),
+        missing=unicode(''),
+        description='Carregar foto'
+    )  	
     video = SchemaNode(
         String(),
         missing=unicode(''),		

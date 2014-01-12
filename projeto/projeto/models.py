@@ -160,6 +160,11 @@ class Atividade(Persistent):
         self.midia_video.append(Video)
         self._p_changed = 1	
 
+    def addFoto(self,Foto):
+		#adiciona videos   
+        self.midia_foto.append(Foto)
+        self._p_changed = 1		
+		
     #método que irá varrer as mídias à procura de alguma marcada para exclusão		
     def delMidiaDen(self):
         i = 0	

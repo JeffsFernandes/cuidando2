@@ -66,7 +66,9 @@ html
           a.navbar-brand href="${request.route_url('inicial')}" Cuidando
           .ul.nav.navbar-nav
             li
-              a href="${request.route_url('lista')}" Listar
+              a href="${request.route_url('listaAtv')}" Listar atividades
+            li
+              a href="${request.route_url('listaUsr')}" Listar usuários
             li
               a href="${request.route_url('mapa')}" Mapa
             li
@@ -75,7 +77,7 @@ html
               a href="${request.route_url('orcamento')}" Orçamento	
             li
               a href="${request.route_url('login')}" Login	
-            /parou de funcionar... vai saber.....			  
+            /parou de funcionar... 		  
             -if hasattr(request.session, "auth")
               li			  
                 a href="${request.route_url('usuario')}" Usuário		

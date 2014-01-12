@@ -62,13 +62,15 @@ def main(global_config, **settings):
 
 	#camminho das páginas
     config.add_route('inicial', '/')
-    config.add_route('lista', '/listar')
+    config.add_route('listaUsr', '/listarUsr')
+    config.add_route('listaAtv', '/listarAtv')	
     config.add_route('cadastro', '/cadastrar')
     config.add_route('configuracao', '/configurar')
     config.add_route('contato', '/contato')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('sobre', '/sobre')
+    config.add_route('perfilUsr', '/usuario/{id}')	
     config.add_route('usuario', '/usuario')
     config.add_route('mapa', '/mapa')
     config.add_route('orcamento', '/orcamento')	

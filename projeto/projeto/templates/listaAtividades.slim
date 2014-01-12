@@ -1,0 +1,11 @@
+-inherit base.slim
+
+-block conteudo
+
+  h1 Atividades usuário
+  -for atividade in atividades
+    h4 
+      a href="${request.route_url('orcamentoId',id=atividade.id )}" ${atividade.atividade}	
+    p =atividade.descricao
+    p =atividade.data
+    p =atividade.cidadao

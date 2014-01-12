@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pyramid.view import view_config
-from .models import Cidadao, Cidadao_twitter,Atividade, Atividade_cidadao, Atividade_orcamento, Dados_site, Midia, Midia_comentario, Midia_video, Denuncia
+from .models import Cidadao, Cidadao_twitter,Atividade, Atividade_cidadao, Atividade_orcamento, Dados_site, Midia, Midia_comentario, Midia_video, Denuncia, Midia_foto
 #from .models import Cidadao, UsrTree, Atividade_cidadao
 #from .models import Cidadao, MyModel, UsrTree
 #por que MyModel?
@@ -83,20 +83,33 @@ def my_view(request):
     }
 
 @view_config(
-    route_name='lista',
-    renderer='lista.slim',
+    route_name='listaUsr',
+    renderer='listaUsuarios.slim',
     permission='comum'
 )
-def lista(request):
+def listaUsr(request):
     """ 
-    Página teste dos cadastros
+    Página para listar usuários cadastrados
     """
     cidadaos = request.db['usrTree'].values()
-    atividades = request.db['atvTree'].values()
+
     return {
         'cidadaos': cidadaos,
-        'atividades': atividades,
     }
+	
+@view_config(
+    route_name='listaAtv',
+    renderer='listaAtividades.slim',
+    permission='comum'
+)
+def listaAtv(request):
+    """ 
+    Página para listar atividades
+    """
+    atividades = request.db['atvTree'].values()
+    return {
+        'atividades': atividades,
+    }	
 	
 @view_config(route_name='cadastro', renderer='cadastro.slim')
 def cadastro(request):
@@ -469,12 +482,21 @@ def usuario(request):
     cidadao = Cidadao("","")
     if not authenticated_userid(request) in request.db["usrTree"]:
         cidadao = request.db["twtTree"][authenticated_userid(request)] 	
-	
-    #cidadao = request.db["usrTree"][authenticated_userid(request)]	
 
     return {
         'cidadao': cidadao
     }
+	
+@view_config(route_name='perfilUsr', renderer='usuario.slim', permission='comum')
+def perfilUsuario(request):
+    """
+	Página do perfil do usuário
+    """
+    cidadao = request.db["twtTree"][request.matchdict['id']] 	
+
+    return {
+        'cidadao': cidadao
+    }	
 
 @view_config(route_name='sobre', renderer='sobre.slim')
 def sobre(request):
@@ -583,7 +605,11 @@ def orcamento(request):
         #chama função para inserir na lista de atualizações		
         Dados_site.addAtual(dadosSite, atv_orc) 
         Dados_site.addFoto(dadosSite)
-        transaction.commit() 		
+		
+        foto = Midia_foto(request.POST.get('foto'), datetime.now(), authenticated_userid(request))		
+        Atividade_cidadao.addFoto(atv_orc, foto)
+        transaction.commit() 	
+			
         return HTTPFound(location=request.route_url('orcamentoId', id=id))	
     elif 'Upload_Video' in request.POST:
         if (not authenticated_userid(request)):
@@ -705,7 +731,8 @@ def orcamento(request):
             'coments': atv_orc.midia_coment,
             'formResp': formsResps,
             'formVideo': formVideo.render(),
-            'videos': atv_orc.midia_video,			
+            'videos': atv_orc.midia_video,		
+            'fotos': atv_orc.midia_foto,				
             'formFoto': formFoto.render(),
             'formSeguir': formSeguir.render(appstruct=appstruct),		
 			#enviar o midia_foto assim que estiverem cadastradas no banco

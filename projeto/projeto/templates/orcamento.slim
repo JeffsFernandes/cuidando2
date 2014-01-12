@@ -21,13 +21,44 @@
   br
   /denunciar a atividade
   /a href="${request.route_url('denuncia')}" Denunciar atividade	  
+  	
+  /exibir as fotos
+   --------------------------------  
   
+  -python
+    i = 0
+    limit = len(fotos)
+	
+  -while i < limit
+
+    /exibição da imagem
+    <img width="420" height="315" src="${fotos[i].imagem}">
+    br 	
+	
+    /tweetar foto	
+    <a href="https://twitter.com/share" class="twitter-share-button" data-url="${fotos[i].imagem}" data-text="Cuidando do meu bairro" data-via="cuidandoDoMeuBairro" data-lang="pt" data-hashtags="cuidando2">Tweetar</a>	
+    
+    /curtir
+    <div class="fb-like" data-href="${fotos[i].imagem}" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>	
+	  
+    /compartilhar	  
+    <div class="fb-share-button" data-href="${fotos[i].imagem}" data-type="button_count"></div>	
+
+    br  
+    /denunciar
+    a href="${request.route_url('denuncia', id=orcamento.id, tmidia='foto', idM=i)}" Denunciar esta imagem	
+	
+    br 
+    br
+
+  /upload de imagens
+   -----------------------  
   -if formFoto
     =formFoto|n
 	
-  /exibir as fotos
-   --------------------------------  
-
+    -python	
+      i +=1  
+  
   /exibição dos vídeos cadastrados
    -------------------------	
   -python
@@ -129,7 +160,7 @@
   /*substituir src com atvOrc.video*/
    -------------------------------------------------
 
-  <img width="420" height="315" src="http://info.abril.com.br/noticias/blogs/gadgets/files/2013/03/487544_365192803580738_842401528_n.jpg" alt="some_text">
+
   
 
 	
