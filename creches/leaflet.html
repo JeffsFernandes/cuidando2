@@ -23,7 +23,7 @@
 	<div id="map" style="width: 1024px; height: 768px"></div>
 
 	<script>
-		
+	
 		
 		$.get("teste.csv", function(data){ // Função em JQUERY para acessar um arquivo no servidor.
 				var teste = $.csv.toArrays(data); // Função da biblioteca para converter o csv em um array.
@@ -81,7 +81,8 @@
 			//Overlays
 			var overlays = {
 				"Públicas": publica,
-				"Privadas": privada
+				"Privadas": privada,
+				"Distritos": kmlLayer
 			};
 
 			L.control.layers(baseLayers, overlays).addTo(map);
