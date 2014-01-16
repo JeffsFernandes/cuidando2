@@ -25,54 +25,68 @@
 	<script>
 	
 		
-		$.get("teste.csv", function(data){ // Função em JQUERY para acessar um arquivo no servidor.
-				var teste = $.csv.toArrays(data); // Função da biblioteca para converter o csv em um array.
-				console.log(teste); // Debug
-				var publica = new L.LayerGroup(); // Criando LayerGroup para creches publicas
-				var privada = new L.LayerGroup(); // Criando LayerGroup para creches particulares
-				// Criando ícones customizados
-				var redIcon = L.Icon.Default.extend({
-	            options: {
-	            	    iconUrl: 'img/carrinho-azul.png' 
-	            	}
-		        });
-	        	var greenIcon = L.Icon.Default.extend({
-	            options: {
-	            	    iconUrl: 'img/carrinho-verde.png' 
-	            	}
-		        });
-	        	var orangeIcon = L.Icon.Default.extend({
-	            options: {
-	            	    iconUrl: 'img/carrinho-laranja.png' 
-	            	}
-	    	    });
-	        	var redIcon = new redIcon();
-	        	var greenIcon = new greenIcon();
-	        	var orangeIcon = new orangeIcon();
-	        	// Percorrendo o array que contém os dados do CSV
-				for(var i=1; i<teste.length-1; i++){
-					var a = teste[i];
-					console.log(a[1]);
-					if(a[1] == 'PUBLICA' || a[1] == 'Publica'){ // Filtro para separar as creches
-						L.marker([a[4],a[3]],{icon: redIcon}).bindPopup(a[0]+"<br>"+"Distrito: "+a[2]).addTo(publica); // Jogando no mapa
-					}else{
-						L.marker([a[4],a[3]],{icon: greenIcon}).bindPopup(a[0]).addTo(privada); // Jogando no mapa
-					}
-				}
-				var cmAttr = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-					cmUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/{styleId}/256/{z}/{x}/{y}.png';
+		$.get("creches3.csv", function(data){ // Função em JQUERY para acessar um arquivo no servidor.
+			var teste = $.csv.toArrays(data); // Função da biblioteca para converter o csv em um array.
 
-				var minimal   = L.tileLayer(cmUrl, {styleId: 22677, attribution: cmAttr});
-				// Criando o mapa
-				var map = L.map('map', {
+
+			// Criando ícones customizados
+			var redIcon = L.Icon.Default.extend({
+				options: {
+					iconUrl: 'img/carrinho-azul.png',
+					iconSize:     [50, 41],
+					popupAnchor:  [15, -41],
+				}
+			});
+			var greenIcon = L.Icon.Default.extend({
+				options: {
+					iconUrl: 'img/carrinho-verde.png', 
+					iconSize:     [50, 41],
+					popupAnchor:  [15, -41],
+				}
+			});
+			var orangeIcon = L.Icon.Default.extend({
+				options: {
+					iconUrl: 'img/carrinho-laranja.png',
+					iconSize:     [50, 41],
+					popupAnchor:  [15, -41],
+				}
+			});
+			var redIcon = new redIcon();
+			var greenIcon = new greenIcon();
+			var orangeIcon = new orangeIcon();
+
+			//var publica = new L.LayerGroup(); // Criando LayerGroup para creches publicas
+			//var privada = new L.LayerGroup(); // Criando LayerGroup para creches particulares
+			// Criando Layers
+			var publica = L.markerClusterGroup();
+			var privada = L.markerClusterGroup();
+
+			// Percorrendo o array que contém os dados do CSV
+			for(var i=1; i<teste.length-1; i++){
+				var a = teste[i];
+				if(a[1] == 'PUBLICA' || a[1] == 'Publica' || a[1][2] == 'b'){ // Filtro para separar as creches
+					console.log("S",a[1]);
+					var marker = L.marker([a[4],a[3]],{icon: redIcon}).bindPopup(a[0]+"<br>"+"Distrito: "+a[2]).addTo(publica); // Jogando no mapa
+				}else{
+					console.log("N",a[1], a[1][2]);
+					var marker = L.marker([a[4],a[3]],{icon: greenIcon}).bindPopup(a[0]+"<br>"+"Distrito: "+a[2]).addTo(privada); // Jogando no mapa
+				}
+			}
+			var cmAttr = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+				cmUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/{styleId}/256/{z}/{x}/{y}.png';
+
+			var minimal   = L.tileLayer(cmUrl, {styleId: 22677, attribution: cmAttr});
+
+			// Criando o mapa
+			var map = L.map('map', {
 				center: [-23.5335074, -46.5666354],
 				zoom: 10,
 				layers: [minimal, publica, privada] 
-				});
-			
+			});
+		
 			//Layer delimitacao	
-			var kmlLayer = new L.KML("distrito.kml", {async: true});
-			map.addLayer(kmlLayer);
+			var distritos = new L.KML("distrito.kml", {async: true});
+			map.addLayer(distritos);
 			
 			//Layers
 			var baseLayers = {
@@ -82,11 +96,11 @@
 			var overlays = {
 				"Públicas": publica,
 				"Privadas": privada,
-				"Distritos": kmlLayer
+				"Distritos": distritos
 			};
 
 			L.control.layers(baseLayers, overlays).addTo(map);
-        });
+		});
         
 	</script>
 </body>
