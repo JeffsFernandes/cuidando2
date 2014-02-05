@@ -66,10 +66,10 @@
 				var a = teste[i];
 				if(a[1] == 'PUBLICA' || a[1] == 'Publica' || a[1][2] == 'b'){ // Filtro para separar as creches
 					console.log("S",a[1]);
-					var marker = L.marker([a[4],a[3]],{icon: redIcon}).bindPopup(a[0]+"<br>"+"Distrito: "+a[2]).addTo(publica); // Jogando no mapa
+					var marker = L.marker([a[4],a[3]],{icon: redIcon}).bindPopup(a[0]+"<br>"+"Distrito: "+a[2]+"<br>"+"Endereço: "+a[11]+" Nº "+a[12]+"<br>"+"CEP: "+a[15]+" Telefone: "+a[17]+"<br>"+"e-mail: "+a[20]+"<br>"+"Situação: "+a[21]+"<br>"+"Abre aos Finais de semana: "+a[93]+"<br><br>"+"Infraestrutura: "+"<br>"+"Numero de Salas utilizadas: "+a[55]+"<br>"+"Acessibilidade: "+a[38]+"<br>"+"Refeitório: "+a[29]+"<br>"+"Despensa: "+a[40]+"<br>"+"Auditorio: "+a[41]+"<br>"+"Laboratório de Informática: "+a[42]+"<br>"+"Laboratório de Ciências: "+a[43]+"<br>"+"Quadra de esportes coberta: "+a[44]+" Descoberta: "+a[45]+"<br>"+"Pátio coberto: "+a[46]+" Descoberto: "+a[47]+"<br>"+"Parque Infantil: "+a[48]+"<br>"+"Biblioteca: "+a[49]+"<br>"+"Berçário: "+a[50]+"<br>"+"Sala de Leitura: "+a[56]+"<br>"+"Area verde: "+a[57]+"Alimentação: "+a[59]+"<br>"+"Internet: "+a[71]+"<br>"+"TV: "+a[84]+"<br>"+"Multimídia: "+a[78]).addTo(publica); // Jogando no mapa
 				}else{
 					console.log("N",a[1], a[1][2]);
-					var marker = L.marker([a[4],a[3]],{icon: greenIcon}).bindPopup(a[0]+"<br>"+"Distrito: "+a[2]).addTo(privada); // Jogando no mapa
+					var marker = L.marker([a[4],a[3]],{icon: greenIcon}).bindPopup(a[0]+"<br>"+"Distrito: "+a[2]+"<br>"+"Endereço: "+a[11]+" Nº "+a[12]+"<br>"+"CEP: "+a[15]+" Telefone: "+a[17]+"<br>"+"e-mail: "+a[20]+"<br>"+"Situação: "+a[21]+"<br>"+"Abre aos Finais de semana: "+a[93]+"<br><br>"+"Infraestrutura: "+"<br>"+"Numero de Salas utilizadas: "+a[55]+"<br>"+"Acessibilidade: "+a[38]+"<br>"+"Refeitório: "+a[29]+"<br>"+"Despensa: "+a[40]+"<br>"+"Auditorio: "+a[41]+"<br>"+"Laboratório de Informática: "+a[42]+"<br>"+"Laboratório de Ciências: "+a[43]+"<br>"+"Quadra de esportes coberta: "+a[44]+" Descoberta: "+a[45]+"<br>"+"Pátio coberto: "+a[46]+" Descoberto: "+a[47]+"<br>"+"Parque Infantil: "+a[48]+"<br>"+"Biblioteca: "+a[49]+"<br>"+"Berçário: "+a[50]+"<br>"+"Sala de Leitura: "+a[56]+"<br>"+"Area verde: "+a[57]+"<br>"+"Alimentação: "+a[59]+"<br>"+"Internet: "+a[71]+"<br>"+"TV: "+a[84]+"<br>"+"Multimídia: "+a[78]).addTo(privada); // Jogando no mapa
 				}
 			}
 			var cmAttr = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
