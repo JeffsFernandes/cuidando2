@@ -29,7 +29,7 @@ def main(global_config, **settings):
         session_factory=session_factory,
     )
     config.include('pyramid_mako')
-    config.add_plim_renderer()
+    config.add_plim_renderer('.slim', mako_settings_prefix='mako.')
 
 	#configuração de autenticação para sessões
     authn_policy = AuthTktAuthenticationPolicy(
