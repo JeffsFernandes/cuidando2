@@ -28,6 +28,7 @@ def main(global_config, **settings):
         settings=settings,
         session_factory=session_factory,
     )
+    config.include('pyramid_mako')
 
 	#configuração de autenticação para sessões
     authn_policy = AuthTktAuthenticationPolicy(
