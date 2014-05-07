@@ -14,7 +14,7 @@
 		header("location:contact.php?message=invalidemail");
 	} else {
 		$to = "cuidando@gpopai.org";
-		$subject = "[CUIDANDO DO MEU BAIRRO] Mensagem de " . $name;
+		$subject = "[CUIDANDO DA MINHA CRECHE] Mensagem de " . $name;
 		mail($to, $subject, $message, 'From:'.$sender."\r\n");
 		header("location:contact.php?message=success");
 	}

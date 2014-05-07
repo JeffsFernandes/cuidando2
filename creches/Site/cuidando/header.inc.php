@@ -16,7 +16,7 @@
 				</ul>
 				<ul class="nav pull-right">
 					<li>
-						<a target="_blank" href="https://twitter.com/share" data-url="http://www.gpopai.usp.br/cuidando" data-lang="pt">
+						<a target="_blank" href="https://twitter.com/share" data-url="http://www.cuidando.org.br" data-lang="pt">
 							Tweetar <i class="icon-share-alt"></i>
 						</a>
 					</li>

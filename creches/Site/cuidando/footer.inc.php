@@ -19,7 +19,10 @@
 			<div class="span4">
 				Desenvolvido por:
 				<ul>
+					
+					<li>Andrés Martano</li>
 					<li>Renan de Souza Ferreira</li>
+					<li>Jefferson Souza Fernandes da Silva</li>
 					<li>Profª. Drª. Gisele da Silva Craveiro</li>
 				</ul>
 				Colaboração:
@@ -42,7 +45,7 @@
 					<li><a target="_blank" href="http://www.opendefinition.org/okd/"><img src="img/opendata.png" alt="OpenData" width="80" height="15"></img></a></li>
 					<li><a target="_blank" href="http://creativecommons.org/licenses/by/3.0/br/"><img alt="Licença Creative Commons" src="img/creativecommons.png" width="80" height="15"></img></a></li>
 					<br>
-					<li><a target="_blank" href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.gpopai.usp.br/cuidando" data-text="Cuidando do meu Bairro:" data-lang="pt">Tweetar</a></li>
+					<li><a target="_blank" href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.cuidando.org.br" data-text="Cuidando do Meu bairro:" data-lang="pt">Tweetar</a></li>
 					<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 				</ul>
 			</div>
