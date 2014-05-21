@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
     <head>
-        <title>Cuidando da minha creche</title>
+        <title>Cuidando do meu bairro Creches</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -62,11 +62,12 @@
                     <h2>Mapa das Creches</h2>
                 </div>
                 
-                <div id="map" style="width: 1170px; height: 700px"></div>	
+                <div id="map" style="width: 1170px; height: 700px"></div>
+			
                 <script>
 
                     //Icones
-                    // Criando Ã­cones customizados
+                    // Criando ícones customizados
 
                     $.get("data/creches.csv", function(data) {
                         var creches = $.csv.toArrays(data);
@@ -107,9 +108,9 @@
                         function popUp(feature, layer) {
                             layer.bindPopup(feature.properties.name);
                         }
-                       
-        		//Criacao das creches                
-	                        for (var i = 1; i < creches.length - 1; i++) {
+                        //Verifica pontos na layer e plota as creches
+                        
+                            for (var i = 1; i < creches.length - 1; i++) {
                                 var a = creches[i];                     
 
                                     //Separa as creches
@@ -123,8 +124,8 @@
                        
 
                         //Configuração tile do mapa
-                        var cmAttr = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-                                cmUrl = 'http://{s}.tile.cloudmade.com/0f41e16652a74c9ba844a8f1a2ffee54/{styleId}/256/{z}/{x}/{y}.png';
+                        var cmAttr = '&copy; Mapbox &copy OpenStreetMap',
+                                cmUrl = 'http://{s}.tiles.mapbox.com/v3/renansfs.ia0j96ji/{z}/{x}/{y}.png';
                         var minimal = L.tileLayer(cmUrl, {styleId: 22677, attribution: cmAttr});
 
                         //Criacao do Mapa e adicionar os distritos
@@ -195,22 +196,83 @@
 
             <section id="char">
                 <div class="page-header">
-                    <h2>EstatÃ­sticas</h2>
+                    <h2>Estatísticas</h2>
                 </div>
                 <div class="columns">
    
                     <div id = "containere" style = "min-width: 310px; height: 400px; margin: 0 auto"> </div>
                     <script>
-                        /*
-                        var dir = new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); //diretorias de ensino
-                        $.get("data/creches.csv", function(data) {
+                        var a = 0;
+                        var pub = new Array(12); //diretorias de ensino publicas
+			var conv = new Array(12);
+			while(a<13){
+				pub[a] = 0;
+				conv[a] = 0;				
+				a++;
+			}                        
+			$.get("data/creches.csv", function(data) {
                             var creches = $.csv.toArrays(data);
+			
                             for (var i = 1; i < creches.length - 1; i++) {
                                 var a = creches[i];
-                                dir[0] = dir[0] + 1;
+				if(a[6] == 'JARDIM PAULISTA' || a[6] == 'ITAIM BIBI' || a[6] == 'BUTANTA' || a[6] == 'RIO PEQUENO' || a[6] == 'PINHEIROS' || a[6] == 'ALTO DE PINHEIROS' || a[6] == 'MORUMBI' || a[6] == 'RAPOSO TAVARES' || 					a[6] == 'VILA SONIA'){ //BUTANTA
+					if(a[4] == 'Privada') conv[0] = conv[0] + 1;
+					else pub[0] = pub[0]+1;
+				}else if(a[6] == 'CAMPO LIMPO' || a[6] == 'JARDIM SAO LUIS' || a[6] == 'VILA ANDRADE' || a[6] == 'CAPAO REDONDO' || a[6] == 'JARDIM ANGELA'){ //CAMPO LIMPO
+					if(a[4] == 'Privada') conv[1] = conv[1] + 1;
+					else pub[1] = pub[1]+1;
+				}
+				else if(a[6] == 'CIDADE DUTRA' || a[6] == 'GRAJAU' || a[6] == 'MARSILAC' || a[6] == 'PARELHEIROS' || a[6] == 'SOCORRO'){ //CAPELA DO SOCORRO
+					if(a[4] == 'Privada') conv[2] = conv[2] + 1;
+					else pub[2] = pub[2]+1;
+				}
+				else if(a[6] == 'LIMAO' || a[6] == 'BRASILANDIA' || a[6] == 'FREGUESIA DO O' || a[6] == 'CASA VERDE' || a[6] == 'CACHOEIRINHA'){  //FREQUESIA/BRASILANDIA
+					if(a[4] == 'Privada') conv[3] = conv[3] + 1;
+					else pub[3] = pub[3]+1;
+				}
+				else if(a[6] == 'GUAIANASES' || a[6] == 'LAJEADO' || a[6] == 'CIDADE TIRADENTES'){ //GUAIANASES
+					if(a[4] == 'Privada') conv[4] = conv[4] + 1; 
+					else pub[4] = pub[4]+1;
+				}
+				else if(a[6] == 'REPUBLICA' || a[6] == 'BELA VISTA' || a[6] == 'BOM RETIRO' || a[6] == 'CAMBUCI' || a[6] == 'CONSOLACAO' ||	a[6] == 'CURSINO' || a[6] == 'IPIRANGA' || a[6] == 'LIBERDADE' || a[6] == 'MOEMA' || a[6] == 'SACOMA' || a[6] == 'SANTA CECILIA' || a[6] == 'SAO LUCAS' || a[6] == 'SAUDE' || a[6] == 'SE' || a[6] == 'VILA MARIANA' || a[6] == 'VILA PRUDENTE'){ //IPIRANGA
+					if(a[4] == 'Privada') conv[5] = conv[5] + 1;
+					else pub[5] = pub[5]+1;
+				}
+				else if(a[6] == 'ARICANDUVA' || a[6] == 'CARRAO' || a[6] == 'CIDADE LIDER' || a[6] == 'ITAQUERA' || a[6] == 'JOSE BONIFACIO' || a[6] == 'PARQUE DO CARMO' || a[6] == 'VILA FORMOSA'){ //ITAQUERA
+					if(a[4] == 'Privada') conv[6] = conv[6] + 1;
+					else pub[6] = pub[6]+1;
+				}
+				else if(a[6] == 'JACANA' || a[6] == 'MANDAQUI' || a[6] == 'SANTANA' || a[6] == 'TREMEMBE' || a[6] == 'TUCURUVI' || a[6] == 'VILA GUILHERME' || a[6] == 'VILA MARIA' || a[6] == 'VILA MEDEIROS'){ 
+					if(a[4] == 'Privada') conv[7] = conv[7] + 1;
+					else pub[7] = pub[7]+1; //JACANA - TREMEMBE
+				}
+				else if(a[6] == 'ITAIM PAULISTA' || a[6] == 'JARDIM HELENA' || a[6] == 'SAO MIGUEL' || a[6] == 'VILA CURUCA' || a[6] == 'VILA JACUI'){ //SAO MIGUEL PAULISTA
+					if(a[4] == 'Privada') conv[8] = conv[8] + 1;
+					else pub[8] = pub[8]+1;
+				}
+				else if(a[6] == 'AGUA RASA' || a[6] == 'ARTUR ALVIM' || a[6] == 'BELEM' || a[6] == 'BRAS' || a[6] == 'CANGAIBA' || a[6] == 'ERMELINO MATARAZZO' || a[6] == 'MOOCA' || a[6] == 'PARI' || a[6] == 'PENHA' ||
+				a[6] == 'PONTE RASA' || a[6] == 'TATUAPE' || a[6] == 'VILA MATILDE'){ //PENHA
+					if(a[4] == 'Privada') conv[9] = conv[9] + 1;
+					else pub[9] = pub[9]+1;
+				}
+				else if(a[6] == 'ANHANGUERA' || a[6] == 'BARRA FUNDA' || a[6] == 'JAGUARA' || a[6] == 'JAGUARE' || a[6] == 'JARAGUA' || a[6] == 'LAPA' || a[6] == 'PERDIZES' || a[6] == 'PERUS' || a[6] == 'PIRITUBA' ||
+				a[6] == 'SAO DOMINGOS' || a[6] == 'VILA LEOPOLDINA'){ //PIRITUBA
+					if(a[4] == 'Privada') conv[10] = conv[10] + 1;
+					else pub[10] = pub[10]+1;
+				}
+				else if(a[6] == 'CAMPO BELO' || a[6] == 'CAMPO GRANDE' || a[6] == 'CIDADE ADEMAR' || a[6] == 'JABAQUARA' || a[6] == 'PEDREIRA' || a[6] == 'SANTO AMARO'){ //SANTO AMARO
+					if(a[4] == 'Privada') conv[11] = conv[11] + 1;
+					else pub[11] = pub[11]+1;
+				}
+				else if(a[6] == 'IGUATEMI' || a[6] == 'SAO MATEUS' || a[6] == 'SAO RAFAEL' || a[6] == 'SAPOPEMBA'){
+					if(a[4] == 'Privada') conv[12] = conv[12] + 1; //SAO MATEUS
+					else pub[12] = pub[12]+1;
+				}else{
+					console.log(a[6]);
+				}
                             }
-       
-*/                                $(function() {
+    
+                             $(function() {
                                         $('#containere').highcharts({
                                             chart: {
                                                 type: 'column'
@@ -234,6 +296,7 @@
                                                     'São Miguel Paulista',
                                                     'Penha',
                                                     'Pirituba',
+						    'Santo Amaro',
                                                     'Sao Mateus'
                                                 ]
                                             },
@@ -246,7 +309,7 @@
                                             tooltip: {
                                                 headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
                                                 pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                                                        '<td style="padding:0"><b>{point.y:.1f} </b></td></tr>',
+                                                             '<td style="padding:0"><b>{point.y:.1f} </b></td></tr>',
                                                 footerFormat: '</table>',
                                                 shared: true,
                                                 useHTML: true
@@ -259,19 +322,19 @@
                                             },
                                             series: [{
                                                     name: 'Públicas',
-                                                    data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+                                                    data: [pub[0], pub[1], pub[2], pub[3], pub[4], pub[5], pub[6], pub[7], pub[8], pub[9], pub[10], pub[11], pub[12]]
 
                                                 }, {
                                                     name: 'Conveniadas',
-                                                    data: [83.6, 78.8, 98.5, 93.4, 106.0, 84.5, 105.0, 104.3, 91.2, 83.5, 106.6, 92.3]
+                                                    data: [conv[0], conv[1], conv[2], conv[3], conv[4], conv[5], conv[6], conv[7], conv[8], conv[9], conv[10], conv[11], conv[12]]
 
                                                 }, {
                                                     name: 'Total',
-                                                    data: [48.9, 38.8, 39.3, 41.4, 47.0, 48.3, 59.0, 59.6, 52.4, 65.2, 59.3, 51.2]
+                                                    data: [(pub[0]+conv[0]),(pub[1]+conv[1]), (pub[2]+conv[2]), (pub[3]+conv[3]), 							   (pub[4]+conv[4]), (pub[5]+conv[5]), (pub[6]+conv[6]), (pub[7]+conv[7]), (pub[8]+conv[8]), (pub[9]+conv[9]), (pub[10]+conv[10]), (pub[11]+conv[11]), (pub[12]+conv[12])]
                                                 }]
                                         });
                                  });
-                     //   });
+                        });
 
 
 

@@ -6,7 +6,7 @@
 		_paq.push(["enableLinkTracking"]);
 
 	  (function() {
-		var u=(("https:" == document.location.protocol) ? "https" : "http") + "://www.gpopai.usp.br/piwik/";
+		var u=(("https:" == document.location.protocol) ? "https" : "http") + "://www.cuidando.org.br";
 		_paq.push(["setTrackerUrl", u+"piwik.php"]);
 		_paq.push(["setSiteId", "1"]);
 		var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
@@ -28,12 +28,12 @@
 				Colaboração:
 				<ul>
 					<li>Prof. Dr. Jorge A. S. Machado</li>
-					<li><a target="_blank" href="http://www.gpopai.usp.br">Grupo de Pesquisa em Políticas Públicas para o Acesso à Informação</a></li>
+					<li><a target="_blank" href="http://www.cuidando.org.br">Grupo de Pesquisa em Políticas Públicas para o Acesso à Informação</a></li>
 				</ul>
 			</div>
 			
 			<div class="span3">
-				Cuidando da minha Creche:
+				Cuidando do meu bairro Creches:
 				<ul>
 					<li><a href="#">Sobre</a></li>
 					<li><a href="contact.php">Contato</a></li>

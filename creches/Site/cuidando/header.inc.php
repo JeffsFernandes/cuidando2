@@ -6,7 +6,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</a>
-			<a class="brand" href="index.php">Cuidando da Minha Creche</a>
+			<a class="brand" href="index.php">Cuidando do meu bairro Creches</a>
 			<div class="nav-collapse" id="main-menu">
 				<ul class="nav">
 					<li><a href="index.php">Home</a></li>
